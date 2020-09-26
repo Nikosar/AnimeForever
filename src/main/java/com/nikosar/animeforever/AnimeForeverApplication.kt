@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PRO
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.apache.http.impl.client.HttpClients
-import org.springframework.boot.SpringApplication
+import org.springframework.boot.WebApplicationType.NONE
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.PropertySources
@@ -33,6 +34,6 @@ open class AnimeForeverApplication {
     }
 }
 
-fun main(vararg args: String) {
-    SpringApplication.run(AnimeForeverApplication::class.java)
+fun main() {
+    SpringApplicationBuilder(AnimeForeverApplication::class.java).web(NONE).run()
 }
