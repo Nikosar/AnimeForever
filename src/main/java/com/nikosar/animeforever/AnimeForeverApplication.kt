@@ -4,14 +4,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PRO
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.apache.http.impl.client.HttpClients
-import org.springframework.boot.WebApplicationType.NONE
+import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.builder.SpringApplicationBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.PropertySources
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
+import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.client.WebClient
+import reactor.netty.http.client.HttpClient
 
 @SpringBootApplication
 @PropertySources(
@@ -32,8 +34,15 @@ open class AnimeForeverApplication {
         objectMapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
         return objectMapper.registerKotlinModule()
     }
+
+    @Bean
+    open fun webClient(): WebClient {
+        val httpClient = HttpClient.create().secure()
+        return WebClient.builder()
+                .clientConnector(ReactorClientHttpConnector(httpClient)).build()
+    }
 }
 
 fun main() {
-    SpringApplicationBuilder(AnimeForeverApplication::class.java).web(NONE).run()
+    SpringApplication.run(AnimeForeverApplication::class.java)
 }

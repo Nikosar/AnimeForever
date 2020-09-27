@@ -21,15 +21,17 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    compile('org.springframework.boot:spring-boot-starter-webflux')
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-    testImplementation('org.springframework.boot:spring-boot-starter-test') {
-        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-    }
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile 'org.apache.httpcomponents:httpclient:4.5.12'
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.+"
     compile 'net.dv8tion:JDA:4.2.0_168'
+
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
+    testCompile('io.projectreactor:reactor-test')
 }
 
 test {
