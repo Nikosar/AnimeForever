@@ -2,16 +2,15 @@ package com.nikosar.animeforever.shikimori
 
 import org.apache.http.client.utils.URIBuilder
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Primary
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.HttpMethod.GET
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.publisher.Mono
 
 @Service
-@Primary
 class ShikimoriImpl(
-        private val restTemplate: RestTemplate,
+        private val webClient: WebClient,
         @Value("\${shikimori.api}")
         private val shikimori: String,
         @Value("\${shikimori.api.animes}")
@@ -19,15 +18,17 @@ class ShikimoriImpl(
 ) : Shikimori {
     private val animeListType = object : ParameterizedTypeReference<List<Anime>>() {}
 
-    override fun animeSearch(search: AnimeSearch, page: Page): List<Anime> {
+    override fun animeSearch(search: AnimeSearch, page: Page): Mono<List<Anime>> {
         val uri = URIBuilder(shikimori)
                 .setPath(animes)
                 .addParameters(search.toNameValuePairs())
                 .addParameters(page.toNameValuePairs()).build()
-        return restTemplate.exchange(uri, GET, null, animeListType).body!!
+        return webClient.get().uri(uri)
+                .accept(APPLICATION_JSON)
+                .retrieve().bodyToMono(animeListType)
     }
 
-    override fun ongoings(): List<Anime> {
-        return animeSearch(AnimeSearch(status = "ongoing"), Page(1, 10))
-    }
+    override fun ongoings(): Mono<List<Anime>> = animeSearch(AnimeSearch(season = "summer_2020"), Page(1, 10))
+
+
 }

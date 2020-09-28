@@ -1,7 +1,9 @@
 package com.nikosar.animeforever.shikimori
 
-interface Shikimori {
-    fun animeSearch(search: AnimeSearch, page: Page = Page(1, 1)): List<Anime>
+import reactor.core.publisher.Mono
 
-    fun ongoings(): List<Anime>
+interface Shikimori {
+    fun animeSearch(search: AnimeSearch, page: Page = Page(1, 1)): Mono<List<Anime>>
+
+    fun ongoings(): Mono<List<Anime>>
 }
