@@ -5,6 +5,8 @@ import club.minnced.jda.reactor.on
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus.ONLINE
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.events.ReadyEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -25,12 +27,16 @@ open class JDABot(
     @EventListener(ApplicationReadyEvent::class)
     override fun start() {
         logger.info("strating jda bot")
-        val jda = JDABuilder.createLight(token)
+        val jda = JDABuilder.createDefault(token)
                 .setEventManager(ReactiveEventManager())
                 .setActivity(Activity.watching("за Коляном"))
                 .setStatus(ONLINE)
+//                .enableCache(VOICE_STATE)
                 .build()
 
+        jda.on<ReadyEvent>()
+                .flatMap { join(jda.getGuildById(587261718602842115)!!) }
+                .subscribe()
         jda.on<MessageReceivedEvent>()
                 .filter { !it.author.isBot }
                 .flatMap { handle(it) }
@@ -46,5 +52,21 @@ open class JDABot(
             "ongoings" -> command.ongoings(args, event)
             else -> Mono.empty<String>()
         }
+    }
+
+    private fun join(guild: Guild): Mono<*> {
+        val channel = guild.getVoiceChannelById(587261718602842127)
+
+        //                val channel = voiceState?.channel
+        //                val guild = channel?.guild
+        val audioManager = guild?.audioManager
+        val audioHandler = AudioHandler()
+        audioManager.sendingHandler = audioHandler
+        audioManager.receivingHandler = audioHandler
+        logger.info("channel {}", channel)
+
+        audioManager.openAudioConnection(channel)
+
+        return Mono.empty<String>()
     }
 }
