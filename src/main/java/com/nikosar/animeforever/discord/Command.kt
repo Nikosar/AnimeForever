@@ -1,14 +1,12 @@
 package com.nikosar.animeforever.discord
 
 import club.minnced.jda.reactor.asMono
-import com.nikosar.animeforever.shikimori.Anime
-import com.nikosar.animeforever.shikimori.AnimeSearch
-import com.nikosar.animeforever.shikimori.Page
-import com.nikosar.animeforever.shikimori.Shikimori
+import com.nikosar.animeforever.shikimori.*
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
+import java.time.LocalDate
 
 @Component
 class Command(
@@ -22,7 +20,12 @@ class Command(
     }
 
     fun ongoings(args: String, event: MessageReceivedEvent): Mono<*> {
-        val ongoings = shikimori.animeSearch(AnimeSearch(season = "summer_2020"), Page(1, 10))
+        val localDate = LocalDate.now()
+        val year = localDate.year
+        val season = fromLocalDate(localDate)
+
+        val search = AnimeSearch(season = "${season.shikiSeason}_$year")
+        val ongoings = shikimori.animeSearch(search, Page(1, 10))
         return ongoings
                 .map { it.fold("") { acc, anime -> "${acc}\n${anime.russian} rating: ${anime.score} ep:${anime.episodes}" } }
                 .flatMap { event.channel.sendMessage(it).asMono() }

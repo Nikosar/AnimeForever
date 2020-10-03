@@ -42,7 +42,7 @@ open class JDABot(
 
         val allArgs = event.message.contentRaw.split(Pattern.compile(" "), 2)
         val command = allArgs[0]
-        val args = allArgs[1]
+        val args = if (allArgs.size > 1) allArgs[1] else ""
         return when (command) {
             "!f" -> this.command.findAnime(args, event)
             "ongoings" -> this.command.ongoings(args, event)
