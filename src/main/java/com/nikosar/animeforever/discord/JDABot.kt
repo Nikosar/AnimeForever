@@ -33,17 +33,19 @@ open class JDABot(
 
         jda.on<MessageReceivedEvent>()
                 .filter { !it.author.isBot }
-                .flatMap { handle(it) }
+                .flatMap { handleMessage(it) }
                 .subscribe()
     }
 
-    private fun handle(event: MessageReceivedEvent): Mono<*> {
+    private fun handleMessage(event: MessageReceivedEvent): Mono<*> {
         logger.info("Message from {} detected: {}", event.author, event.message)
 
-        val args = event.message.contentRaw.split(Pattern.compile(" "))
-        return when (args[0]) {
-            "!f" -> command.findAnime(args, event)
-            "ongoings" -> command.ongoings(args, event)
+        val allArgs = event.message.contentRaw.split(Pattern.compile(" "), 2)
+        val command = allArgs[0]
+        val args = allArgs[1]
+        return when (command) {
+            "!f" -> this.command.findAnime(args, event)
+            "ongoings" -> this.command.ongoings(args, event)
             else -> Mono.empty<String>()
         }
     }
