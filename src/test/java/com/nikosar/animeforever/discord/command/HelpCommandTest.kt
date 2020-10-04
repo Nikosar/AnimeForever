@@ -14,7 +14,7 @@ internal class HelpCommandTest : AnimeForeverApplicationTests() {
 
     @Test
     fun helpMePlease() {
-        val helpMePlease = helpCommand.helpMePlease("", Mockito.mock(MessageReceivedEvent::class.java))
+        val helpMePlease = helpCommand.helpMePlease("", Mockito.mock(MessageReceivedEvent::class.java)).block()
         assertThat(helpMePlease, containsString("[!mockf, !mockfind] $BRAVE_TEST_PHRASE"))
     }
 }
