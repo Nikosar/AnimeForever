@@ -15,13 +15,13 @@ class ShikiCommand(
         @Value("\${shikimori.api}")
         private val shikimoriApi: String
 ) {
-    @BotCommand(value = ["!f"], description = "find anime with max rating by query")
+    @BotCommand(value = ["!f"], description = "%query% || find anime with max rating by query")
     fun findAnime(args: String, event: MessageReceivedEvent): Mono<*> {
         return shikimori.animeSearch(AnimeSearch(args))
                 .flatMap { event.channel.sendMessage(buildUrl(it)).asMono() }
     }
 
-    @BotCommand(["on", "ongoings"], description = "find top 10 anime of current season")
+    @BotCommand(["on", "ongoings"], description = "|| find top 10 anime of current season")
     fun ongoings(args: String, event: MessageReceivedEvent): Mono<*> {
         val localDate = LocalDate.now()
         val year = localDate.year
@@ -37,7 +37,7 @@ class ShikiCommand(
     @BotCommand(["bring"], visible = false)
     fun coffeeCommand(args: String, event: MessageReceivedEvent): Mono<*> {
         return if (args == "me coffee, please") {
-            event.channel.sendMessage("your coffee!").asMono()
+            event.channel.sendMessage("your coffee! <here must be a smile of coffee>").asMono()
         } else {
             Mono.empty<String>()
         }
