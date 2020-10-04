@@ -28,7 +28,7 @@ class HelpCommand(private val applicationContext: ApplicationContext) {
                 .filter { it.hasAnnotation<BotCommand>() }
                 .map { it.findAnnotation<BotCommand>()!! }
                 .filter { it.visible }
-                .map { "${it.value.asList()} ${it.description}" }
+                .map { "${it.value.asList()} -> ${it.description}" }
                 .joinToString("\n")
     }
 }
