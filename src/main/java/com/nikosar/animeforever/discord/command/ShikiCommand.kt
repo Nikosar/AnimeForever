@@ -37,7 +37,7 @@ class ShikiCommand(
     @BotCommand(["bring"], visible = false)
     fun coffeeCommand(args: String, event: MessageReceivedEvent): Mono<*> {
         return if (args == "me coffee, please") {
-            event.channel.sendMessage("your coffee! <here must be a smile of coffee>").asMono()
+            event.channel.sendMessage("Your coffee :coffee:").asMono()
         } else {
             Mono.empty<String>()
         }
