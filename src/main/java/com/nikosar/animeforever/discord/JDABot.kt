@@ -2,6 +2,7 @@ package com.nikosar.animeforever.discord
 
 import club.minnced.jda.reactor.ReactiveEventManager
 import club.minnced.jda.reactor.on
+import com.nikosar.animeforever.discord.command.CommandFactory
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus.ONLINE
 import net.dv8tion.jda.api.entities.Activity
@@ -18,7 +19,7 @@ import java.util.regex.Pattern
 @Service
 open class JDABot(
         @Value("\${discord.bot.token}") val token: String,
-        private val command: Command
+        private val commandFactory: CommandFactory
 ) : DiscordBot {
     private val logger: Logger = LoggerFactory.getLogger(JDABot::class.java)
 
@@ -43,10 +44,7 @@ open class JDABot(
         val allArgs = event.message.contentRaw.split(Pattern.compile(" "), 2)
         val command = allArgs[0]
         val args = if (allArgs.size > 1) allArgs[1] else ""
-        return when (command) {
-            "!f" -> this.command.findAnime(args, event)
-            "ongoings" -> this.command.ongoings(args, event)
-            else -> Mono.empty<String>()
-        }
+        return commandFactory.createCommand(command)
+                .execute(args, event)
     }
 }
