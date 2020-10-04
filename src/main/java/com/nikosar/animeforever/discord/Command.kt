@@ -34,5 +34,10 @@ class Command(
                 .flatMap { event.channel.sendMessage(it).asMono() }
     }
 
+    @BotCommand(["bring"])
+    fun command(args: String, event: MessageReceivedEvent): Mono<*> {
+        return event.channel.sendMessage("your coffee!").asMono()
+    }
+
     private fun buildUrl(it: List<Anime>) = shikimoriApi + it[0].url
 }

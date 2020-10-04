@@ -3,6 +3,7 @@ package com.nikosar.animeforever.discord
 import club.minnced.jda.reactor.ReactiveEventManager
 import club.minnced.jda.reactor.on
 import com.nikosar.animeforever.discord.command.CommandFactory
+import com.nikosar.animeforever.discord.command.CommandNotFoundException
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus.ONLINE
 import net.dv8tion.jda.api.entities.Activity
@@ -39,12 +40,15 @@ open class JDABot(
     }
 
     private fun handleMessage(event: MessageReceivedEvent): Mono<*> {
-        logger.info("Message from {} detected: {}", event.author, event.message)
-
-        val allArgs = event.message.contentRaw.split(Pattern.compile(" "), 2)
-        val command = allArgs[0]
-        val args = if (allArgs.size > 1) allArgs[1] else ""
-        return commandFactory.createCommand(command)
-                .execute(args, event)
+        return try {
+            val allArgs = event.message.contentRaw.split(Pattern.compile(" "), 2)
+            val command = allArgs[0]
+            val args = if (allArgs.size > 1) allArgs[1] else ""
+            commandFactory.createCommand(command)
+                    .execute(args, event)
+        } catch (e: CommandNotFoundException) {
+            logger.error("{}. Message from {} detected: {}", e.message, event.author, event.message)
+            Mono.empty<String>()
+        }
     }
 }
