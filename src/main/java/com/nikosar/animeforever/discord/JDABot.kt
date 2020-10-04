@@ -2,8 +2,8 @@ package com.nikosar.animeforever.discord
 
 import club.minnced.jda.reactor.ReactiveEventManager
 import club.minnced.jda.reactor.on
-import com.nikosar.animeforever.discord.command.CommandFactory
-import com.nikosar.animeforever.discord.command.CommandNotFoundException
+import com.nikosar.animeforever.discord.command.processor.CommandFactory
+import com.nikosar.animeforever.discord.command.processor.CommandNotFoundException
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus.ONLINE
 import net.dv8tion.jda.api.entities.Activity
@@ -26,10 +26,9 @@ open class JDABot(
 
     @EventListener(ApplicationReadyEvent::class)
     override fun start() {
-        logger.info("strating jda bot")
         val jda = JDABuilder.createLight(token)
                 .setEventManager(ReactiveEventManager())
-                .setActivity(Activity.watching("за Коляном"))
+                .setActivity(Activity.listening("for commands"))
                 .setStatus(ONLINE)
                 .build()
 

@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.discord.command
+package com.nikosar.animeforever.discord.command.processor
 
 import org.springframework.stereotype.Component
 
