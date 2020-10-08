@@ -49,7 +49,10 @@ open class JDABot(
                     .execute(args, event)
         } catch (e: CommandNotFoundException) {
             logger.error("{}. Message from {} detected: {}", e.message, event.author, event.message)
-            Mono.empty<String>()
+            Mono.empty<Any>()
+        } catch (e: Exception) {
+            logger.error("smth went wrong", e)
+            Mono.empty<Any>()
         }
     }
 }

@@ -9,6 +9,7 @@ data class Anime(
         var name: String,
         var russian: String,
         var url: String,
+        var image: ImageUrls?,
         var kind: String?,
         var score: BigDecimal = BigDecimal.ZERO,
         var status: String?,
