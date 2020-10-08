@@ -7,6 +7,7 @@ import com.nikosar.animeforever.discord.command.processor.CommandNotFoundExcepti
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus.ONLINE
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.entities.ChannelType.PRIVATE
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -21,19 +22,20 @@ import java.util.regex.Pattern
 open class JDABot(
         @Value("\${discord.bot.token}") val token: String,
         private val commandFactory: CommandFactory
-) : DiscordBot {
+) {
     private val logger: Logger = LoggerFactory.getLogger(JDABot::class.java)
 
     @EventListener(ApplicationReadyEvent::class)
-    override fun start() {
+    fun start() {
         val jda = JDABuilder.createLight(token)
                 .setEventManager(ReactiveEventManager())
-                .setActivity(Activity.listening("for commands"))
+                .setActivity(Activity.listening("-help"))
                 .setStatus(ONLINE)
                 .build()
 
         jda.on<MessageReceivedEvent>()
                 .filter { !it.author.isBot }
+                .filter { it.message.channelType == PRIVATE || it.channel.name == "bot" }
                 .flatMap { handleMessage(it) }
                 .subscribe()
     }

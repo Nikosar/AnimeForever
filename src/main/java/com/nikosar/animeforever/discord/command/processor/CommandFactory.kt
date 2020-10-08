@@ -23,16 +23,16 @@ class CommandFactory(private val applicationContext: ApplicationContext) {
         val commandBeans = applicationContext.getBeansWithAnnotation(BotCommander::class.java)
         nameToCommand = commandBeans.asSequence()
                 .map { it.value }
-                .flatMap { command -> pairCommandNameWithCommand(command) }
+                .flatMap { command -> pairNameWith(command) }
                 .associate { it }
     }
 
-    private fun pairCommandNameWithCommand(command: Any) =
+    private fun pairNameWith(command: Any) =
             command::class.memberFunctions.asSequence()
                     .filter { it.hasAnnotation<BotCommand>() }
-                    .flatMap { kFunction -> functionToNameCommandPair(kFunction, command) }
+                    .flatMap { kFunction -> nameCommandPair(kFunction, command) }
 
-    private fun functionToNameCommandPair(kFunction: KFunction<*>, command: Any): Sequence<Pair<String, Command>> {
+    private fun nameCommandPair(kFunction: KFunction<*>, command: Any): Sequence<Pair<String, Command>> {
         return kFunction.findAnnotation<BotCommand>()!!.value
                 .asSequence()
                 .map { Pair(it, command(kFunction, command)) }

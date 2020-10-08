@@ -15,7 +15,7 @@ class ShikiCommand(
         @Value("\${shikimori.api}")
         private val shikimoriApi: String
 ) {
-    @BotCommand(value = ["!f"], description = "find anime with max rating by query")
+    @BotCommand(value = ["-f"], description = "find anime with max rating by query")
     fun findAnime(args: String, event: MessageReceivedEvent): Mono<*> {
         return shikimori.animeSearch(AnimeSearch(args))
                 .flatMap { event.channel.sendMessage(buildUrl(it)).asMono() }
