@@ -13,7 +13,7 @@ import kotlin.reflect.full.memberFunctions
 
 @BotCommander
 class HelpCommand(private val applicationContext: ApplicationContext) {
-    @BotCommand(["-help"], visible = false)
+    @BotCommand(["-help", "help"], visible = false)
     fun helpMePlease(args: String, event: MessageReceivedEvent): Mono<*> {
         val commanders = applicationContext.getBeansWithAnnotation<BotCommander>()
         val help = collectHelpInfo(commanders)

@@ -14,12 +14,19 @@ import java.time.LocalDate
 class ShikiCommand(
         private val shikimori: Shikimori,
         @Value("\${shikimori.api}")
-        private val shikimoriApi: String
+        private val shikimoriApi: String,
+        private val onlineWatchWebsite: OnlineWatchWebsite
 ) {
-    @BotCommand(value = ["-f"], description = "find anime with max rating by query")
+    @BotCommand(value = ["-f", "find"], description = "find anime with max rating by query")
     fun findAnime(args: String, event: MessageReceivedEvent): Mono<*> {
         return shikimori.animeSearch(AnimeSearch(args))
                 .flatMap { event.channel.sendMessage(buildUrl(it[0])).asMono() }
+    }
+
+    @BotCommand(value = ["-w", "watch"], description = "prepare search to animego")
+    fun watchAnime(args: String, event: MessageReceivedEvent): Mono<*> {
+        return shikimori.animeSearch(AnimeSearch(args))
+                .flatMap { event.channel.sendMessage(onlineWatchWebsite.makeUrlFrom(it[0].russian)).asMono() }
     }
 
     @BotCommand(["on", "ongoings"], description = "find top 10 anime of current season")
@@ -28,8 +35,8 @@ class ShikiCommand(
                 val embedBuilder = EmbedBuilder().setColor(16712698).setTitle("Онгоинги")
                 it.forEachIndexed { i, anime ->
                     anime.apply {
-                        embedBuilder.addField("${i + 1}. [$russian](${buildUrl(this)})",
-                                "rating: $score ep:$episodes",
+                        embedBuilder.addField("${i + 1}. $russian})",
+                                "$score:star:  ep:$episodesAired/$episodes  $",
                                 false)
                     }
                 }
