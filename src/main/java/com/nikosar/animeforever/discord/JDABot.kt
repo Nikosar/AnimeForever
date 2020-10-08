@@ -22,11 +22,11 @@ import java.util.regex.Pattern
 open class JDABot(
         @Value("\${discord.bot.token}") val token: String,
         private val commandFactory: CommandFactory
-) {
+) : DiscordBot {
     private val logger: Logger = LoggerFactory.getLogger(JDABot::class.java)
 
     @EventListener(ApplicationReadyEvent::class)
-    fun start() {
+    override fun start() {
         val jda = JDABuilder.createLight(token)
                 .setEventManager(ReactiveEventManager())
                 .setActivity(Activity.listening("-help"))
