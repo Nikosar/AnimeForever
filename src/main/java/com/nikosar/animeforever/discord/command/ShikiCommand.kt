@@ -4,9 +4,11 @@ import club.minnced.jda.reactor.asMono
 import com.nikosar.animeforever.discord.command.processor.BotCommand
 import com.nikosar.animeforever.discord.command.processor.BotCommander
 import com.nikosar.animeforever.shikimori.*
+import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.springframework.beans.factory.annotation.Value
 import reactor.core.publisher.Mono
+import java.awt.Color.PINK
 import java.time.LocalDate
 
 @BotCommander
@@ -22,16 +24,27 @@ class ShikiCommand(
     }
 
     @BotCommand(["on", "ongoings"], description = "find top 10 anime of current season")
-    fun ongoings(args: String, event: MessageReceivedEvent): Mono<*> {
+    fun ongoings(args: String, event: MessageReceivedEvent): Mono<*> = requestOngoings()
+            .map {
+                val embedBuilder = EmbedBuilder().setColor(PINK).setTitle("Ongoings")
+                it.forEachIndexed { i, anime ->
+                    anime.apply {
+                        embedBuilder.addField("${i + 1}. $name",
+                                "rating: $score ep:$episodes",
+                                false)
+                    }
+                }
+                embedBuilder.build()
+            }
+            .flatMap { event.channel.sendMessage(it).asMono() }
+
+    private fun requestOngoings(): Mono<List<Anime>> {
         val localDate = LocalDate.now()
         val year = localDate.year
         val season = fromLocalDate(localDate)
 
         val search = AnimeSearch(season = "${season.shikiSeason}_$year")
-        val ongoings = shikimori.animeSearch(search, Page(1, 10))
-        return ongoings
-                .map { it.fold("") { acc, anime -> "${acc}\n${anime.russian} rating: ${anime.score} ep:${anime.episodes}" } }
-                .flatMap { event.channel.sendMessage(it).asMono() }
+        return shikimori.animeSearch(search, Page(1, 10))
     }
 
     @BotCommand(["bring"], visible = false)
