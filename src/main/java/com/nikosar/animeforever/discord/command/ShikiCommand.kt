@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.springframework.beans.factory.annotation.Value
 import reactor.core.publisher.Mono
-import java.awt.Color.PINK
 import java.time.LocalDate
 
 @BotCommander
@@ -20,16 +19,16 @@ class ShikiCommand(
     @BotCommand(value = ["-f"], description = "find anime with max rating by query")
     fun findAnime(args: String, event: MessageReceivedEvent): Mono<*> {
         return shikimori.animeSearch(AnimeSearch(args))
-                .flatMap { event.channel.sendMessage(buildUrl(it)).asMono() }
+                .flatMap { event.channel.sendMessage(buildUrl(it[0])).asMono() }
     }
 
     @BotCommand(["on", "ongoings"], description = "find top 10 anime of current season")
     fun ongoings(args: String, event: MessageReceivedEvent): Mono<*> = requestOngoings()
             .map {
-                val embedBuilder = EmbedBuilder().setColor(PINK).setTitle("Ongoings")
+                val embedBuilder = EmbedBuilder().setColor(16712698).setTitle("Онгоинги")
                 it.forEachIndexed { i, anime ->
                     anime.apply {
-                        embedBuilder.addField("${i + 1}. $name",
+                        embedBuilder.addField("${i + 1}. [$russian](${buildUrl(this)})",
                                 "rating: $score ep:$episodes",
                                 false)
                     }
@@ -56,5 +55,5 @@ class ShikiCommand(
         }
     }
 
-    private fun buildUrl(it: List<Anime>) = shikimoriApi + it[0].url
+    private fun buildUrl(it: Anime) = shikimoriApi + it.url
 }
