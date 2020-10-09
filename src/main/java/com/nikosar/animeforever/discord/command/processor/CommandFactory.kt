@@ -15,7 +15,7 @@ class CommandFactory(private val applicationContext: ApplicationContext) {
     private lateinit var nameToCommand: Map<String, Command>
 
     fun createCommand(name: String): Command {
-        return nameToCommand[name] ?: throw CommandNotFoundException("command $name not found")
+        return nameToCommand[name.toLowerCase()] ?: throw CommandNotFoundException("command $name not found")
     }
 
     @EventListener(ApplicationStartedEvent::class)

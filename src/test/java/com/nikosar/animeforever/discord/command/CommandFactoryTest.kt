@@ -24,7 +24,7 @@ internal class CommandFactoryTest : AnimeForeverApplicationTests() {
         block = createCommand.execute("123", Mockito.mock(MessageReceivedEvent::class.java)).block()
         assertEquals("123", block)
 
-        createCommand = commandFactory.createCommand("!testCommand")
+        createCommand = commandFactory.createCommand("!testcommand")
         block = createCommand.execute("123", Mockito.mock(MessageReceivedEvent::class.java)).block()
         assertEquals("test", block)
     }

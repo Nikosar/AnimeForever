@@ -13,7 +13,7 @@ class TestCommand {
 
 @BotCommander
 class TestCommand2 {
-    @BotCommand(["!testCommand"])
+    @BotCommand(["!testcommand"])
     fun execute(args: String, event: MessageReceivedEvent): Mono<*> = Mono.just("test")
 }
 
