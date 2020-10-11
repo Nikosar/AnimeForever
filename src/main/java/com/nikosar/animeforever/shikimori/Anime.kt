@@ -1,14 +1,18 @@
 package com.nikosar.animeforever.shikimori
 
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
+import com.fasterxml.jackson.databind.annotation.JsonNaming
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 data class Anime(
         var id: Long,
         var name: String,
         var russian: String,
         var url: String,
+        var image: ImageUrls?,
         var kind: String?,
         var score: BigDecimal = BigDecimal.ZERO,
         var status: String?,
