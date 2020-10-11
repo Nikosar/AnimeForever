@@ -7,9 +7,9 @@ import com.nikosar.animeforever.discord.command.processor.CommandNotFoundExcepti
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus.ONLINE
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.entities.ChannelType.PRIVATE
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.ReadyEvent
-import net.dv8tion.jda.api.entities.ChannelType.PRIVATE
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -69,7 +69,6 @@ open class JDABot(
         //                val guild = channel?.guild
         val audioManager = guild?.audioManager
         val audioHandler = AudioHandler()
-        audioManager.sendingHandler = audioHandler
         audioManager.receivingHandler = audioHandler
         logger.info("channel {}", channel)
 
