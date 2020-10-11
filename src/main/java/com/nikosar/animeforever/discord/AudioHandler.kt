@@ -10,7 +10,6 @@ import java.io.FileOutputStream
 import java.nio.ByteBuffer
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentLinkedQueue
-import kotlin.math.pow
 
 class AudioHandler : AudioReceiveHandler, AudioSendHandler {
     private val logger: Logger = LoggerFactory.getLogger(AudioHandler::class.java)
@@ -19,7 +18,6 @@ class AudioHandler : AudioReceiveHandler, AudioSendHandler {
     private val list = mutableListOf<Byte>()
 
     override fun handleUserAudio(userAudio: UserAudio) {
-        logger.info("user audio")
     }
 
     override fun handleCombinedAudio(combinedAudio: CombinedAudio) {
@@ -47,23 +45,6 @@ class AudioHandler : AudioReceiveHandler, AudioSendHandler {
 //        queue.add(audioData)
     }
 
-    private fun bytesToDouble(audioData: ByteArray): DoubleArray {
-        val doubleArray = DoubleArray(audioData.size / 2)
-        for (i: Int in doubleArray.indices) {
-            doubleArray[i] = (audioData[i * 2].toInt() shl 4 + audioData[i * 2 + 1].toInt()).toDouble()
-        }
-        return doubleArray
-    }
-
-    fun calculateRMS(audioData: DoubleArray): Double {
-        var squareSum = 0.0
-
-        for (byte in audioData) {
-            squareSum += byte.pow(2)
-        }
-        val avgMeanSquare = squareSum / audioData.size
-        return avgMeanSquare.pow(0.5)
-    }
 
     override fun canReceiveCombined(): Boolean {
         return list.size < 384000

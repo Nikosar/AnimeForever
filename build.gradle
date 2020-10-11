@@ -31,6 +31,9 @@ dependencies {
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.+"
     implementation 'net.dv8tion:JDA:4.2.0_168'
     implementation("club.minnced:jda-reactor:1.2.0")
+    implementation 'org.nd4j:nd4j-native-platform:1.0.0-beta7'
+    implementation 'org.nd4j:nd4j-native:1.0.0-beta7'
+    implementation 'org.nd4j:nd4j-native:1.0.0-beta7:windows-x86_64-avx2'
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
