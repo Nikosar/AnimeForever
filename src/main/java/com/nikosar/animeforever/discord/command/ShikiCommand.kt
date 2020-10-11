@@ -50,7 +50,7 @@ class ShikiCommand(
                 it.forEachIndexed { i, anime ->
                     anime.apply {
                         embedBuilder.addField("${i + 1}. $russian",
-                                "$score:star:  ep:$episodesAired/$episodes  $",
+                                "$score:star:  ep:$episodesAired/$episodes",
                                 false)
                     }
                 }
