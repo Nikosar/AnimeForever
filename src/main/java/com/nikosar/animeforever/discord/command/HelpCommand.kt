@@ -3,6 +3,7 @@ package com.nikosar.animeforever.discord.command
 import club.minnced.jda.reactor.asMono
 import com.nikosar.animeforever.discord.command.processor.BotCommand
 import com.nikosar.animeforever.discord.command.processor.BotCommander
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.springframework.beans.factory.getBeansWithAnnotation
 import org.springframework.context.ApplicationContext
@@ -14,7 +15,7 @@ import kotlin.reflect.full.memberFunctions
 @BotCommander
 class HelpCommand(private val applicationContext: ApplicationContext) {
     @BotCommand(["-help", "help"], visible = false)
-    fun helpMePlease(args: String, event: MessageReceivedEvent): Mono<*> {
+    fun helpMePlease(args: String, event: MessageReceivedEvent): Mono<Message> {
         val commanders = applicationContext.getBeansWithAnnotation<BotCommander>()
         val help = collectHelpInfo(commanders)
         return event.channel.sendMessage(help)

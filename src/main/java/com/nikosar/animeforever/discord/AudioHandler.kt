@@ -5,11 +5,12 @@ import net.dv8tion.jda.api.audio.CombinedAudio
 import net.dv8tion.jda.api.audio.UserAudio
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.nio.ByteBuffer
 
 class AudioHandler : AudioReceiveHandler {
     private val logger: Logger = LoggerFactory.getLogger(AudioHandler::class.java)
     private val levels = mutableListOf<Double>()
+    var sessionLevel = 0.0
+        private set
 
     override fun handleUserAudio(userAudio: UserAudio) {
     }
@@ -19,28 +20,22 @@ class AudioHandler : AudioReceiveHandler {
             return;
         }
         val audioData = combinedAudio.getAudioData(1.0)
-        levels.add(rms(readStereo(audioData)))
+        levels.add(rms(read_16bit(audioData)))
 
         if (levels.size >= 50) {
-            logger.info("Loudness level for last second = ${rms(levels.toDoubleArray())}")
+            val rms = rms(*levels.toDoubleArray())
+            logger.info("Loudness level for last second = $rms")
             levels.clear()
+            sessionLevel = rms(sessionLevel, rms)
         }
 
     }
 
-    fun readStereo(byteArray: ByteArray): ShortArray {
-        val shortArray = ShortArray(byteArray.size / 2)
-        ByteBuffer.wrap(byteArray).asShortBuffer().get(shortArray)
-        return shortArray
-    }
-
     override fun canReceiveCombined(): Boolean {
-        return true
+        return levels.size < 200
     }
 
     override fun canReceiveUser(): Boolean {
         return false
     }
-
-
 }

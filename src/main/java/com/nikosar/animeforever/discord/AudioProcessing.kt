@@ -1,5 +1,6 @@
 package com.nikosar.animeforever.discord
 
+import java.nio.ByteBuffer
 import kotlin.math.pow
 
 fun rms(audioData: ShortArray): Double {
@@ -12,7 +13,7 @@ fun rms(audioData: ShortArray): Double {
     return avgMeanSquare.pow(0.5)
 }
 
-fun rms(audioData: DoubleArray): Double {
+fun rms(vararg audioData: Double): Double {
     var squareSum = 0.0
 
     for (byte in audioData) {
@@ -20,4 +21,10 @@ fun rms(audioData: DoubleArray): Double {
     }
     val avgMeanSquare = squareSum / audioData.size
     return avgMeanSquare.pow(0.5)
+}
+
+fun read_16bit(byteArray: ByteArray): ShortArray {
+    val shortArray = ShortArray(byteArray.size / 2)
+    ByteBuffer.wrap(byteArray).asShortBuffer().get(shortArray)
+    return shortArray
 }
