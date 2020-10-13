@@ -17,4 +17,4 @@ class TestCommand2 {
     fun execute(args: String, event: MessageReceivedEvent): Mono<*> = Mono.just("test")
 }
 
-const val BRAVE_TEST_PHRASE = "mcck your life!"
+const val BRAVE_TEST_PHRASE = "mock your life!"
