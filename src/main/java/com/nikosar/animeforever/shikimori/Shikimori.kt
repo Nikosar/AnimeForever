@@ -17,13 +17,20 @@ class Shikimori(
         private val animes: String
 ) : AnimeProvider {
     private val animeListType = object : ParameterizedTypeReference<List<Anime>>() {}
+    private val descriptionLinks = Regex("\\[.+?]")
+
 
     override fun findById(id: Long): Mono<Anime> {
         val uri = URIBuilder(shikimori)
                 .setPath("$animes/$id").build()
         return webClient.get().uri(uri)
                 .accept(APPLICATION_JSON)
-                .retrieve().bodyToMono(Anime::class.java)
+                .retrieve()
+                .bodyToMono(Anime::class.java)
+                .map {
+                    it.description = it.description?.replace(descriptionLinks, "")
+                    it
+                }
     }
 
     override fun search(search: AnimeSearch, page: Page): Mono<List<Anime>> {

@@ -1,7 +1,7 @@
 GET https://shikimori.one/api/animes?name=ученик&page=1&limit=1
 
 ###
-GET https://shikimori.one/api/animes/5114
+GET https://shikimori.one/api/animes/40059
 
 ###
 GET https://shikimori.one/api/animes?search=Непутёвый&order=ranked&limit=10&season=fall_2020
@@ -11,3 +11,9 @@ GET https://shikimori.one/api/animes?search=Fullmetal+Alchemist%3A+Brotherhood
 
 ###
 GET https://shikimori.one/api/animes/966-crayon-shin-chan
+
+###
+GET https://shikimori.one/api/animes/121
+
+###
+GET https://shikimori.one/api/characters/138553
