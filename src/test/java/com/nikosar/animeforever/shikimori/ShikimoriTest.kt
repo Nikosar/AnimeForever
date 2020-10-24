@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import reactor.test.StepVerifier
 
-internal class ShikimoriImplTest @Autowired constructor(
-        private val shikimoriImpl: ShikimoriImpl
+internal class ShikimoriTest @Autowired constructor(
+        private val shikimoriImpl: Shikimori
 ) : AnimeForeverApplicationTests() {
 
     @Test
