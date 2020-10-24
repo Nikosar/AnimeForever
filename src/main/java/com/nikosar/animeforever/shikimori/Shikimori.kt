@@ -29,4 +29,6 @@ class Shikimori(
     }
 
     override fun ongoings(): Mono<List<Anime>> = search(AnimeSearch(season = "summer_2020"), Page(1, 10))
+
+    override fun makeUrlFrom(animeUrl: String?) = if (animeUrl != null) shikimori + animeUrl else null
 }

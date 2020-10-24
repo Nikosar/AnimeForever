@@ -3,12 +3,12 @@ package com.nikosar.animeforever.discord
 import club.minnced.jda.reactor.ReactiveEventManager
 import club.minnced.jda.reactor.on
 import com.nikosar.animeforever.discord.command.processor.CommandFactory
-import com.nikosar.animeforever.discord.command.processor.CommandNotFoundException
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus.ONLINE
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.ChannelType.PRIVATE
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import org.reactivestreams.Publisher
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -40,16 +40,13 @@ open class JDABot(
                 .subscribe()
     }
 
-    private fun handleMessage(event: MessageReceivedEvent): Mono<*> {
+    private fun handleMessage(event: MessageReceivedEvent): Publisher<*> {
         return try {
             val allArgs = event.message.contentRaw.split(Pattern.compile(" "), 2)
             val command = allArgs[0]
             val args = if (allArgs.size > 1) allArgs[1] else ""
             commandFactory.createCommand(command)
-                    .execute(args, event)
-        } catch (e: CommandNotFoundException) {
-            logger.error("{}. Message from {} detected: {}", e.message, event.author, event.message)
-            Mono.empty<Any>()
+                    ?.execute(args, event) ?: Mono.empty<Any>()
         } catch (e: Exception) {
             logger.error("smth went wrong", e)
             Mono.empty<Any>()

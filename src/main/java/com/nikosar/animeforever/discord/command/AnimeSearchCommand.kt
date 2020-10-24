@@ -5,39 +5,49 @@ import com.nikosar.animeforever.discord.command.processor.BotCommand
 import com.nikosar.animeforever.discord.command.processor.BotCommander
 import com.nikosar.animeforever.shikimori.*
 import net.dv8tion.jda.api.EmbedBuilder
-import net.dv8tion.jda.api.MessageBuilder
-import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import org.springframework.beans.factory.annotation.Value
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 
 @BotCommander
 class AnimeSearchCommand(
         private val animeProvider: AnimeProvider,
-        @Value("\${shikimori.api}")
-        private val shikimoriApi: String,
         private val onlineWatchWebsite: OnlineWatchWebsite
 ) {
     @BotCommand(value = ["-f", "find"], description = "find anime with max rating by query")
-    fun findAnime(args: String, event: MessageReceivedEvent): Mono<*> {
+    fun findAnime(args: String, event: MessageReceivedEvent): Flux<*> {
         return animeProvider.search(AnimeSearch(args))
-                .map { createFindEmbed(it.getOrNull(0)) }
-                .flatMap { event.channel.sendMessage(it).asMono() }
+                .flatMapMany {
+                    val anime = it.getOrNull(0)
+                    if (anime != null) {
+                        Flux.just(
+                                event.channel.sendMessage(createFindMessage(anime)),
+                                event.channel.sendMessage(createWatchEmbed(anime))
+                        )
+                    } else {
+                        Mono.just(":crab:")
+                    }
+                }
     }
 
-    private fun createFindEmbed(anime: Anime?): Message {
-        val messageBuilder = MessageBuilder()
-        return if (anime != null) {
-            messageBuilder.setContent(buildUrl(anime))
-            messageBuilder.setEmbed(
-                    EmbedBuilder().setColor(BEST_PINK_COLOR)
-                            .setTitle("$WATCH -> ${anime.russian}", onlineWatchWebsite.makeUrlFrom(anime.name)).build()
-            )
-            messageBuilder.build()
-        } else {
-            messageBuilder.setContent(":crab:").build()
-        }
+    private fun createFindMessage(anime: Anime): MessageEmbed {
+        val title = "$WATCH -> ${anime.russian}"
+        val url = animeProvider.makeUrlFrom(anime.url)
+        val imageUrl = animeProvider.makeUrlFrom(anime.image?.original)
+        return EmbedBuilder().setColor(BEST_PINK_COLOR)
+                .setTitle(title, url)
+                .setImage(imageUrl)
+                .build()
+    }
+
+    private fun createWatchEmbed(anime: Anime): MessageEmbed {
+        val title = "$WATCH -> ${anime.russian}"
+        val url = onlineWatchWebsite.makeUrlFrom(anime.name)
+        return EmbedBuilder().setColor(BEST_PINK_COLOR)
+                .setTitle(title, url)
+                .build()
     }
 
     @BotCommand(["on", "ongoings"], description = "find top 10 anime of current season")
@@ -72,8 +82,6 @@ class AnimeSearchCommand(
             Mono.empty<String>()
         }
     }
-
-    private fun buildUrl(anime: Anime) = shikimoriApi + anime.url
 }
 
 const val BEST_PINK_COLOR = 16712698

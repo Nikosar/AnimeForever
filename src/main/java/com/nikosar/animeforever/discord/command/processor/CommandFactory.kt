@@ -4,7 +4,7 @@ import org.springframework.boot.context.event.ApplicationStartedEvent
 import org.springframework.context.ApplicationContext
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
-import reactor.core.publisher.Mono
+import reactor.core.CorePublisher
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
@@ -14,8 +14,8 @@ import kotlin.reflect.full.memberFunctions
 class CommandFactory(private val applicationContext: ApplicationContext) {
     private lateinit var nameToCommand: Map<String, Command>
 
-    fun createCommand(name: String): Command {
-        return nameToCommand[name.toLowerCase()] ?: throw CommandNotFoundException("command $name not found")
+    fun createCommand(name: String): Command? {
+        return nameToCommand[name.toLowerCase()]
     }
 
     @EventListener(ApplicationStartedEvent::class)
@@ -39,6 +39,6 @@ class CommandFactory(private val applicationContext: ApplicationContext) {
     }
 
     private fun command(kFunction: KFunction<*>, command: Any): Command {
-        return Command { args, event -> kFunction.call(command, args, event) as Mono<*> }
+        return Command { args, event -> kFunction.call(command, args, event) as CorePublisher<*> }
     }
 }

@@ -2,13 +2,11 @@ package com.nikosar.animeforever.discord.command
 
 import com.nikosar.animeforever.AnimeForeverApplicationTests
 import com.nikosar.animeforever.discord.command.processor.CommandFactory
-import com.nikosar.animeforever.discord.command.processor.CommandNotFoundException
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
+import reactor.test.StepVerifier
 
 internal class CommandFactoryTest : AnimeForeverApplicationTests() {
     @Autowired
@@ -17,20 +15,18 @@ internal class CommandFactoryTest : AnimeForeverApplicationTests() {
     @Test
     fun commandCreatedSuccessful() {
         var createCommand = commandFactory.createCommand("!mockfind")
-        var block = createCommand.execute("123", Mockito.mock(MessageReceivedEvent::class.java)).block()
-        assertEquals("123", block)
+        StepVerifier.create(createCommand!!.execute("123", Mockito.mock(MessageReceivedEvent::class.java)))
+                .assertNext { it == "123" }
+                .verifyComplete()
 
         createCommand = commandFactory.createCommand("!mockf")
-        block = createCommand.execute("123", Mockito.mock(MessageReceivedEvent::class.java)).block()
-        assertEquals("123", block)
+        StepVerifier.create(createCommand!!.execute("123", Mockito.mock(MessageReceivedEvent::class.java)))
+                .assertNext { it == "123" }
+                .verifyComplete()
 
         createCommand = commandFactory.createCommand("!testcommand")
-        block = createCommand.execute("123", Mockito.mock(MessageReceivedEvent::class.java)).block()
-        assertEquals("test", block)
-    }
-
-    @Test
-    fun failOnWrongCommand() {
-        assertThrows<CommandNotFoundException> { commandFactory.createCommand("!notExistedCommand") }
+        StepVerifier.create(createCommand!!.execute("123", Mockito.mock(MessageReceivedEvent::class.java)))
+                .assertNext { it == "test" }
+                .verifyComplete()
     }
 }
