@@ -18,6 +18,14 @@ class Shikimori(
 ) : AnimeProvider {
     private val animeListType = object : ParameterizedTypeReference<List<Anime>>() {}
 
+    override fun findById(id: Long): Mono<Anime> {
+        val uri = URIBuilder(shikimori)
+                .setPath("$animes/$id").build()
+        return webClient.get().uri(uri)
+                .accept(APPLICATION_JSON)
+                .retrieve().bodyToMono(Anime::class.java)
+    }
+
     override fun search(search: AnimeSearch, page: Page): Mono<List<Anime>> {
         val uri = URIBuilder(shikimori)
                 .setPath(animes)

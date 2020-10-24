@@ -5,7 +5,8 @@ import com.nikosar.animeforever.discord.command.processor.BotCommand
 import com.nikosar.animeforever.discord.command.processor.BotCommander
 import com.nikosar.animeforever.shikimori.*
 import net.dv8tion.jda.api.EmbedBuilder
-import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.MessageBuilder
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -17,37 +18,46 @@ class AnimeSearchCommand(
         private val onlineWatchWebsite: OnlineWatchWebsite
 ) {
     @BotCommand(value = ["-f", "find"], description = "find anime with max rating by query")
-    fun findAnime(args: String, event: MessageReceivedEvent): Flux<*> {
-        return animeProvider.search(AnimeSearch(args))
-                .flatMapMany {
-                    val anime = it.getOrNull(0)
-                    if (anime != null) {
+    fun findAnime(args: String, event: MessageReceivedEvent): Flux<*> =
+            animeProvider.search(AnimeSearch(args))
+                    .filter { it.isNotEmpty() }
+                    .map { it[0] }
+                    .flatMap { animeProvider.findById(it.id) }
+                    .flatMapMany {
                         Flux.just(
-                                event.channel.sendMessage(createFindMessage(anime)),
-                                event.channel.sendMessage(createWatchEmbed(anime))
+                                createFindMessage(it),
+                                createWatchMessage(it)
                         )
-                    } else {
-                        Mono.just(":crab:")
                     }
-                }
-    }
+                    .defaultIfEmpty(MessageBuilder(CRAB).build())
+                    .flatMap { event.channel.sendMessage(it).asMono() }
 
-    private fun createFindMessage(anime: Anime): MessageEmbed {
-        val title = "$WATCH -> ${anime.russian}"
+    private fun createFindMessage(anime: Anime): Message {
+        val title = anime.russian
         val url = animeProvider.makeUrlFrom(anime.url)
         val imageUrl = animeProvider.makeUrlFrom(anime.image?.original)
-        return EmbedBuilder().setColor(BEST_PINK_COLOR)
-                .setTitle(title, url)
-                .setImage(imageUrl)
-                .build()
+        val messageBuilder = MessageBuilder().setContent(url)
+        anime.apply {
+            val embed = EmbedBuilder().setColor(BEST_PINK_COLOR)
+                    .setTitle(title, url)
+                    .setImage(imageUrl)
+                    .setDescription(anime.description)
+                    .addField(RATING, "$score$RATING_EMOJI", true)
+                    .addField(EPISODES, "$episodesAired/$episodes", true)
+                    .addField(GENRES, genres?.joinToString { it.russian }, false)
+                    .build()
+            messageBuilder.setEmbed(embed)
+        }
+        return messageBuilder.build()
     }
 
-    private fun createWatchEmbed(anime: Anime): MessageEmbed {
+    private fun createWatchMessage(anime: Anime): Message {
         val title = "$WATCH -> ${anime.russian}"
         val url = onlineWatchWebsite.makeUrlFrom(anime.name)
-        return EmbedBuilder().setColor(BEST_PINK_COLOR)
+        val embed = EmbedBuilder().setColor(BEST_PINK_COLOR)
                 .setTitle(title, url)
                 .build()
+        return MessageBuilder().setEmbed(embed).build()
     }
 
     @BotCommand(["on", "ongoings"], description = "find top 10 anime of current season")
@@ -57,7 +67,7 @@ class AnimeSearchCommand(
                 it.forEachIndexed { i, anime ->
                     anime.apply {
                         embedBuilder.addField("${i + 1}. $russian",
-                                "$score:star:  ep:$episodesAired/$episodes",
+                                "$score$RATING_EMOJI  ep:$episodesAired/$episodes",
                                 false)
                     }
                 }
@@ -87,3 +97,8 @@ class AnimeSearchCommand(
 const val BEST_PINK_COLOR = 16712698
 const val WATCH = "Смотреть"
 const val ONGOINGS = "Онгоинги"
+const val RATING = "Рейтинг"
+const val EPISODES = "Эпизоды"
+const val GENRES = "Жанры"
+const val RATING_EMOJI = ":star"
+const val CRAB = ":crab:"

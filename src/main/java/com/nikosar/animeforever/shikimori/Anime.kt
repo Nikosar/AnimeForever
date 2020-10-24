@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.annotation.JsonNaming
 import java.math.BigDecimal
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy::class)
 data class Anime(
@@ -32,6 +31,8 @@ data class Anime(
         var threadId: Long,
         var topicId: Long,
         var myanimelistId: Long,
-        var updatedAt: LocalDateTime?,
-        var nextEpisodeAt: LocalDateTime?,
+        var genres: List<Genre>?
+
+//        var updatedAt: LocalDateTime?,
+//        var nextEpisodeAt: LocalDateTime?,
 )

@@ -11,8 +11,8 @@ internal class ShikimoriTest @Autowired constructor(
 
     @Test
     fun animeSearch() {
-        StepVerifier.create(shikimoriImpl.ongoings())
-                .assertNext { it.isNotEmpty() }
+        StepVerifier.create(shikimoriImpl.findById(5114))
+                .assertNext { it.genres?.isNotEmpty() }
                 .verifyComplete()
     }
 }
