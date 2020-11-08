@@ -14,7 +14,7 @@ import kotlin.reflect.full.memberFunctions
 @BotCommander
 class HelpCommand(private val applicationContext: ApplicationContext) {
     @BotCommand(["-help", "help"], visible = false)
-    fun helpMePlease(args: String, event: MessageReceivedEvent): Mono<*> {
+    fun helpMePlease(event: MessageReceivedEvent): Mono<*> {
         val commanders = applicationContext.getBeansWithAnnotation<BotCommander>()
         val help = collectHelpInfo(commanders)
         return event.channel.sendMessage(help)

@@ -6,12 +6,17 @@ import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import reactor.core.CorePublisher
 import kotlin.reflect.KFunction
+import kotlin.reflect.KParameter
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.full.memberFunctions
 
 @Component
-class CommandFactory(private val applicationContext: ApplicationContext) {
+class CommandFactory(
+        private val applicationContext: ApplicationContext,
+        private val sequentialParams: SequentialParams
+
+) {
     private lateinit var nameToCommand: Map<String, Command>
 
     fun createCommand(name: String): Command? {
@@ -39,6 +44,13 @@ class CommandFactory(private val applicationContext: ApplicationContext) {
     }
 
     private fun command(kFunction: KFunction<*>, command: Any): Command {
-        return Command { args, event -> kFunction.call(command, args, event) as CorePublisher<*> }
+        return Command { args, event ->
+            val funcParams = kFunction.parameters
+            val paramsMap = mutableMapOf<KParameter, Any>()
+            paramsMap[funcParams[0]] = command
+            paramsMap[funcParams[1]] = event
+            paramsMap.putAll(sequentialParams.convert(args, funcParams))
+            kFunction.callBy(paramsMap) as CorePublisher<*>
+        }
     }
 }
