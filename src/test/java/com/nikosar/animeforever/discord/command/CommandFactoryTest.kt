@@ -55,7 +55,7 @@ internal class CommandFactoryTest : AnimeForeverApplicationTests() {
     @Test
     fun commandSumWith2ArgsWorking() {
         val createCommand = commandFactory.createCommand("!sum")
-        StepVerifier.create(createCommand!!.execute("1n 100", mockk<MessageReceivedEvent>()))
+        StepVerifier.create(createCommand!!.execute("1 100", mockk<MessageReceivedEvent>()))
                 .assertNext { it == "101" }
                 .verifyComplete()
     }

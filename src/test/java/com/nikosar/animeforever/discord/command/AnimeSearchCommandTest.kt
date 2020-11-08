@@ -17,11 +17,9 @@ internal class AnimeSearchCommandTest {
         val animeProvider = mockk<AnimeProvider>()
         val animeSearchCommand = AnimeSearchCommand(animeProvider, watchWebsite)
 
-        every { animeProvider.search(any(), any()) } returns Mono.just(emptyList())
+        every { animeProvider.ongoings(any()) } returns Mono.just(emptyList())
         val event = mockEvent()
         animeSearchCommand.ongoings(event, 2, 20)
-        verify { animeProvider.search(any(), Page(2, 20)) }
-
-
+        verify { animeProvider.ongoings(Page(2, 20)) }
     }
 }
