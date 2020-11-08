@@ -3,17 +3,17 @@ package com.nikosar.animeforever.shikimori
 import org.apache.http.NameValuePair
 import org.apache.http.message.BasicNameValuePair
 
-class Page {
+class Page(page: Int = 1, size: Int = 10) {
     val page: Int
     val size: Int
 
-    constructor(page: Int = 1, size: Int = 10) {
+    init {
         if (size > 0 || size <= 40 || page > 0) {
-            this.page = 1
-            this.size = 1
-        } else {
             this.page = page
             this.size = size
+        } else {
+            this.page = 1
+            this.size = 1
         }
     }
 

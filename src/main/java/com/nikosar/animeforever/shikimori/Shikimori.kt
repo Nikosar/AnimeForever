@@ -7,7 +7,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import java.time.LocalDate
 
 @Service
 class Shikimori(
@@ -42,14 +41,6 @@ class Shikimori(
         return webClient.get().uri(uri)
                 .accept(APPLICATION_JSON)
                 .retrieve().bodyToMono(animeListType)
-    }
-
-    override fun ongoings(page: Page): Mono<List<Anime>> {
-        val localDate = LocalDate.now()
-        val year = localDate.year
-        val season = fromLocalDate(localDate)
-
-        return search(AnimeSearch(season = "${season.shikiSeason}_$year"), page)
     }
 
     override fun makeUrlFrom(animeUrl: String?) = if (animeUrl != null) shikimori + animeUrl else null
