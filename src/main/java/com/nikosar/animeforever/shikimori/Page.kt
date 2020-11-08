@@ -20,7 +20,7 @@ class Page(page: Int = 1, size: Int = 10) {
     fun toNameValuePairs(): List<NameValuePair> {
         return listOf(
                 BasicNameValuePair("page", page.toString()),
-                BasicNameValuePair("size", size.toString())
+                BasicNameValuePair("limit", size.toString())
         )
     }
 

@@ -49,7 +49,11 @@ class CommandFactory(
             val paramsMap = mutableMapOf<KParameter, Any>()
             paramsMap[funcParams[0]] = command
             paramsMap[funcParams[1]] = event
-            paramsMap.putAll(sequentialParams.convert(args, funcParams))
+            if (kFunction.hasAnnotation<Sequential>()) {
+                paramsMap.putAll(sequentialParams.convert(args, funcParams))
+            } else if (args.isNotBlank()) {
+                paramsMap[funcParams[2]] = args
+            }
             kFunction.callBy(paramsMap) as CorePublisher<*>
         }
     }

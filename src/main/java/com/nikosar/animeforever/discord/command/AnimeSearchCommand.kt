@@ -3,6 +3,7 @@ package com.nikosar.animeforever.discord.command
 import club.minnced.jda.reactor.asMono
 import com.nikosar.animeforever.discord.command.processor.BotCommand
 import com.nikosar.animeforever.discord.command.processor.BotCommander
+import com.nikosar.animeforever.discord.command.processor.Sequential
 import com.nikosar.animeforever.shikimori.*
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.MessageBuilder
@@ -20,8 +21,8 @@ class AnimeSearchCommand(
         private val onlineWatchWebsite: OnlineWatchWebsite
 ) {
     @BotCommand(value = ["-f", "find"], description = "find anime with max rating by query")
-    fun findAnime(event: MessageReceivedEvent, args: String): Flux<*> =
-            animeProvider.search(AnimeSearch(args))
+    fun findAnime(event: MessageReceivedEvent, search: String): Flux<*> =
+            animeProvider.search(AnimeSearch(search))
                     .filter { it.isNotEmpty() }
                     .map { it[0] }
                     .flatMap { animeProvider.findById(it.id) }
@@ -33,6 +34,7 @@ class AnimeSearchCommand(
                     }
                     .defaultIfEmpty(MessageBuilder(CRAB).build())
                     .flatMap { event.channel.sendMessage(it).asMono() }
+
 
     private fun createFindMessage(anime: Anime): Message {
         val title = anime.russian
@@ -53,6 +55,7 @@ class AnimeSearchCommand(
         return messageBuilder.build()
     }
 
+
     private fun createWatchMessage(anime: Anime): Message {
         val title = "$WATCH -> ${anime.russian}"
         val url = onlineWatchWebsite.makeUrlFrom(anime.name)
@@ -62,18 +65,21 @@ class AnimeSearchCommand(
         return MessageBuilder().setEmbed(embed).build()
     }
 
-    @BotCommand(["on", "ongoings"], description = "find top 10 anime of current season")
-    fun ongoings(event: MessageReceivedEvent, page: Int = 1, size: Int = 10): Mono<*> = best(event)
 
-    @BotCommand(["best"], description = "best anime for given season or year")
-    fun best(event: MessageReceivedEvent,
-             year: Int = Year.now().value,
-             season: Season = fromLocalDate(LocalDate.now()),
-             page: Int = 1,
-             size: Int = 10
-    ): Mono<*> = animeProvider.search(AnimeSearch(season = season, year = year), Page(page, size))
-            .map { listMessage(it, page, size) }
-            .flatMap { event.channel.sendMessage(it).asMono() }
+    @BotCommand(["on", "ongoings"], description = "find top anime of current season")
+    @Sequential
+    fun ongoings(event: MessageReceivedEvent, page: Int = 1, size: Int = 20): Mono<*> =
+            best(event, Year.now().value, fromLocalDate(LocalDate.now()), page, size)
+
+
+    @BotCommand(["best"], description = "best anime for given year and season")
+    @Sequential
+    fun best(event: MessageReceivedEvent, year: Int? = null,
+             season: Season? = null, page: Int = 1, size: Int = 20): Mono<*> =
+            animeProvider.search(AnimeSearch(season = season, year = year), Page(page, size))
+                    .map { listMessage(it, page, size) }
+                    .flatMap { event.channel.sendMessage(it).asMono() }
+
 
     private fun listMessage(animes: List<Anime>, page: Int, size: Int): MessageEmbed {
         val embedBuilder = EmbedBuilder().setColor(BEST_PINK_COLOR).setTitle(ONGOINGS)
@@ -87,6 +93,7 @@ class AnimeSearchCommand(
         }
         return embedBuilder.build()
     }
+
 
     @BotCommand(["bring"], visible = false)
     fun coffeeCommand(event: MessageReceivedEvent, args: String): Mono<*> {
