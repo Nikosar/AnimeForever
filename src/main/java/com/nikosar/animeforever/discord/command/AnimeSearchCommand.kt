@@ -1,6 +1,8 @@
 package com.nikosar.animeforever.discord.command
 
 import club.minnced.jda.reactor.asMono
+import com.nikosar.animeforever.animesites.OnlineWatchWebsite
+import com.nikosar.animeforever.discord.asLink
 import com.nikosar.animeforever.discord.command.processor.BotCommand
 import com.nikosar.animeforever.discord.command.processor.BotCommander
 import com.nikosar.animeforever.discord.command.processor.Sequential
@@ -18,7 +20,7 @@ import java.time.Year
 @BotCommander
 class AnimeSearchCommand(
         private val animeProvider: AnimeProvider,
-        private val onlineWatchWebsite: OnlineWatchWebsite
+        private val watchSites: Map<String, OnlineWatchWebsite>
 ) {
     @BotCommand(value = ["-f", "find"], description = "find anime with max rating by query")
     fun findAnime(event: MessageReceivedEvent, search: String): Flux<*> =
@@ -57,10 +59,12 @@ class AnimeSearchCommand(
 
 
     private fun createWatchMessage(anime: Anime): Message {
-        val title = "$WATCH -> ${anime.russian}"
-        val url = onlineWatchWebsite.makeUrlFrom(anime.name)
+
+        val description = watchSites.entries
+                .joinToString("\n") { asLink("$WATCH -> ${it.key}", it.value.makeUrlFrom(anime.name)) }
         val embed = EmbedBuilder().setColor(BEST_PINK_COLOR)
-                .setTitle(title, url)
+                .setDescription(description)
+                .setTitle(anime.russian)
                 .build()
         return MessageBuilder().setEmbed(embed).build()
     }

@@ -2,6 +2,7 @@ package com.nikosar.animeforever.discord.command
 
 import com.nikosar.animeforever.discord.command.processor.BotCommand
 import com.nikosar.animeforever.discord.command.processor.BotCommander
+import com.nikosar.animeforever.discord.command.processor.Sequential
 import com.nikosar.animeforever.shikimori.Season
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import reactor.core.publisher.Mono
@@ -27,6 +28,7 @@ class TestCommandWithoutArgs {
 @BotCommander
 class TestCommandWithArgs {
     @BotCommand(["!sum"], description = BRAVE_TEST_PHRASE)
+    @Sequential
     fun execute(event: MessageReceivedEvent, i: Int, long: Long, season: Season): Mono<*> = Mono.just("${i + long} $season")
 }
 

@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.discord.command
+package com.nikosar.animeforever.animesites
 
 import org.apache.http.client.utils.URIBuilder
 import org.springframework.beans.factory.annotation.Value
@@ -11,4 +11,13 @@ class AnimeGo(
 ) : OnlineWatchWebsite {
     override fun makeUrlFrom(search: String) = URIBuilder(onlineWatchUrl)
             .addParameter("q", search).build().toString()
+}
+
+@Service
+class YummyAnime(
+        @Value("\${yummyanime.url}")
+        private val onlineWatchUrl: String
+) : OnlineWatchWebsite {
+    override fun makeUrlFrom(search: String) = URIBuilder(onlineWatchUrl)
+            .addParameter("word", search).build().toString()
 }

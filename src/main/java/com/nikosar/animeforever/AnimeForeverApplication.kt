@@ -3,10 +3,12 @@ package com.nikosar.animeforever
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.nikosar.animeforever.animesites.OnlineWatchWebsite
 import org.apache.http.impl.client.HttpClients
 import org.modelmapper.ModelMapper
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.PropertySource
 import org.springframework.context.annotation.PropertySources
@@ -45,6 +47,11 @@ open class AnimeForeverApplication {
 
     @Bean
     open fun modelMapper(): ModelMapper = ModelMapper()
+
+    @Bean
+    open fun watchSites(applicationContext: ApplicationContext): Map<String, OnlineWatchWebsite> {
+        return applicationContext.getBeansOfType(OnlineWatchWebsite::class.java)
+    }
 }
 
 fun main() {
