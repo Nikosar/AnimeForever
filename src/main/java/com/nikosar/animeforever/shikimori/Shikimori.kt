@@ -3,6 +3,7 @@ package com.nikosar.animeforever.shikimori
 import org.apache.http.client.utils.URIBuilder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
+import org.springframework.http.HttpHeaders.USER_AGENT
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
@@ -14,7 +15,9 @@ class Shikimori(
         @Value("\${shikimori.api}")
         private val shikimori: String,
         @Value("\${shikimori.api.animes}")
-        private val animes: String
+        private val animes: String,
+        @Value("spring.application.name")
+        private val applicationName: String
 ) : AnimeProvider {
     private val animeListType = object : ParameterizedTypeReference<List<Anime>>() {}
     private val descriptionLinks = Regex("\\[.+?]")
@@ -24,6 +27,7 @@ class Shikimori(
         val uri = URIBuilder(shikimori)
                 .setPath("$animes/$id").build()
         return webClient.get().uri(uri)
+                .header(USER_AGENT, applicationName)
                 .accept(APPLICATION_JSON)
                 .retrieve()
                 .bodyToMono(Anime::class.java)
