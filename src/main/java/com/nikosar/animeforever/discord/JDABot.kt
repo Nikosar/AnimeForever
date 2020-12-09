@@ -6,7 +6,6 @@ import com.nikosar.animeforever.discord.command.processor.CommandFactory
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus.ONLINE
 import net.dv8tion.jda.api.entities.Activity
-import net.dv8tion.jda.api.entities.ChannelType.PRIVATE
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.reactivestreams.Publisher
 import org.slf4j.Logger
@@ -35,7 +34,6 @@ open class JDABot(
 
         jda.on<MessageReceivedEvent>()
                 .filter { !it.author.isBot }
-                .filter { it.message.channelType == PRIVATE || it.channel.name == "bot" }
                 .flatMap { handleMessage(it) }
                 .subscribe()
     }
