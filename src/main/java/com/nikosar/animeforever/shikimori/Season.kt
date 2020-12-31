@@ -15,9 +15,9 @@ enum class Season {
 
 fun fromLocalDate(localDate: LocalDate): Season {
     return when (localDate.month) {
-        DECEMBER, JANUARY, FEBRUARY -> Season.WINTER
-        MARCH, APRIL, MAY -> Season.SPRING
-        JUNE, JULY, AUGUST -> Season.SUMMER
-        SEPTEMBER, OCTOBER, NOVEMBER -> Season.FALL
+        JANUARY, FEBRUARY, MARCH -> Season.WINTER
+        APRIL, MAY, JUNE -> Season.SPRING
+        JULY, AUGUST, SEPTEMBER -> Season.SUMMER
+        OCTOBER, NOVEMBER, DECEMBER -> Season.FALL
     }
 }
