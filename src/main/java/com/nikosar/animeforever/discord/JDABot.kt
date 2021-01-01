@@ -35,6 +35,7 @@ open class JDABot(
         jda.on<MessageReceivedEvent>()
                 .filter { !it.author.isBot }
                 .flatMap { handleMessage(it) }
+                .doOnError { logger.error(it.message) }
                 .subscribe()
     }
 

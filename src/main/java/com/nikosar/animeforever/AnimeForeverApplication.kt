@@ -19,10 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient
 import reactor.netty.http.client.HttpClient
 
 @SpringBootApplication
-@PropertySources(
-        PropertySource("classpath:/application.properties"),
-        PropertySource("classpath:/secret.properties"),
-)
+@PropertySources(PropertySource("classpath:/secret.properties"))
 open class AnimeForeverApplication {
     @Bean
     open fun restTemplate(): RestTemplate {
