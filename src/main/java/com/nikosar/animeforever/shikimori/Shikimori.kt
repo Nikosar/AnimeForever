@@ -16,7 +16,7 @@ class Shikimori(
         private val shikimori: String,
         @Value("\${shikimori.api.animes}")
         private val animes: String,
-        @Value("spring.application.name")
+        @Value("\${spring.application.name}")
         private val applicationName: String
 ) : AnimeProvider {
     private val animeListType = object : ParameterizedTypeReference<List<Anime>>() {}
