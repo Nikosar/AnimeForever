@@ -3,6 +3,7 @@ package com.nikosar.animeforever
 import com.nikosar.animeforever.discord.JDABot
 import io.mockk.every
 import io.mockk.mockk
+import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.MessageBuilder
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageChannel
@@ -18,6 +19,9 @@ internal open class AnimeForeverApplicationTests {
     @MockBean
     lateinit var jdaBot: JDABot
 
+    @MockBean
+    lateinit var jda: JDA
+
     @Test
     fun contextLoads() {
     }
@@ -26,8 +30,13 @@ internal open class AnimeForeverApplicationTests {
 fun mockEvent(): MessageReceivedEvent {
     val event = mockk<MessageReceivedEvent>()
     val channel = mockk<MessageChannel>()
-    val messageAction = mockk<MessageAction>()
     every { event.channel } returns channel
+    mockSendMessage(channel)
+    return event
+}
+
+fun <T : MessageChannel> mockSendMessage(channel: T) {
+    val messageAction = mockk<MessageAction>()
     every { channel.sendMessage(any<String>()) } answers { call ->
         val future = CompletableFuture<Message>()
         val message = MessageBuilder(call.invocation.args[0] as String).build()
@@ -36,5 +45,4 @@ fun mockEvent(): MessageReceivedEvent {
         every { messageAction.submit() } returns future
         messageAction
     }
-    return event
 }

@@ -10,7 +10,9 @@ class AnimeGo(
         private val onlineWatchUrl: String
 ) : OnlineWatchWebsite {
     override fun makeUrlFrom(search: String) = URIBuilder(onlineWatchUrl)
-            .addParameter("q", search).build().toString()
+        .addParameter("q", search).build().toString()
+
+    override fun name(): String = "Anime Go"
 }
 
 @Service
@@ -19,5 +21,7 @@ class YummyAnime(
         private val onlineWatchUrl: String
 ) : OnlineWatchWebsite {
     override fun makeUrlFrom(search: String) = URIBuilder(onlineWatchUrl)
-            .addParameter("word", search).build().toString()
+        .addParameter("word", search).build().toString()
+
+    override fun name(): String = "Yummyanime"
 }

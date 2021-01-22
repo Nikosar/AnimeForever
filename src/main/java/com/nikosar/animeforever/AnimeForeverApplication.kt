@@ -1,11 +1,18 @@
 package com.nikosar.animeforever
 
+import club.minnced.jda.reactor.ReactiveEventManager
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.nikosar.animeforever.animesites.OnlineWatchWebsite
+import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.OnlineStatus
+import net.dv8tion.jda.api.entities.Activity
 import org.apache.http.impl.client.HttpClients
 import org.modelmapper.ModelMapper
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.ApplicationContext
@@ -21,6 +28,16 @@ import reactor.netty.http.client.HttpClient
 @SpringBootApplication
 @PropertySources(PropertySource("classpath:/secret.properties"))
 open class AnimeForeverApplication {
+
+    @Bean
+    open fun jda(@Value("\${discord.bot.token}") token: String): JDA {
+        return JDABuilder.createLight(token)
+            .setEventManager(ReactiveEventManager())
+            .setActivity(Activity.listening("-help"))
+            .setStatus(OnlineStatus.ONLINE)
+            .build()
+    }
+
     @Bean
     open fun restTemplate(): RestTemplate {
         val default = HttpClients.createDefault()
@@ -32,6 +49,7 @@ open class AnimeForeverApplication {
     open fun objectMapper(): ObjectMapper {
         val objectMapper = ObjectMapper()
         objectMapper.configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+        objectMapper.registerModule(JavaTimeModule())
         return objectMapper.registerKotlinModule()
     }
 
