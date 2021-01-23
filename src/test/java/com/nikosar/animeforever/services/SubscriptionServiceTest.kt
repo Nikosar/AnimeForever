@@ -10,8 +10,7 @@ import io.mockk.*
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.TextChannel
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,7 +39,7 @@ internal open class SubscriptionServiceTest
     // not supported for test https://github.com/spring-projects/spring-framework/issues/24226
     //    @Transactional
     open fun successfulSubscribe() {
-        val anime = createAnimeMock(1L, NOTICEABLE_TIME)
+        val anime = mockAnime(1L, NOTICEABLE_TIME)
         val subscription = Subscription(
             null,
             3L,
@@ -54,8 +53,8 @@ internal open class SubscriptionServiceTest
 
     @Test
     open fun releasesTest() {
-        animeService.save(createAnimeMock(2L, NOTICEABLE_TIME)).block()
-        animeService.save(createAnimeMock(3L, NOT_NOTICEABLE_TIME)).block()
+        animeService.save(mockAnime(2L, NOTICEABLE_TIME)).block()
+        animeService.save(mockAnime(3L, NOT_NOTICEABLE_TIME)).block()
         val subscription = Subscription(null, 1L, 2L, 1L)
         val subscription2 = Subscription(null, 2L, 3L, 1L)
         subscriptionRepository.save(subscription)
@@ -85,11 +84,26 @@ internal open class SubscriptionServiceTest
         confirmVerified(animeProvider, jda, channel)
     }
 
+    @Test
+    fun isSubscribed() {
+        val mockAnime = mockAnime(1)
+        val subscription = Subscription(null, 1, 1, 1)
+        StepVerifier.create(subscriptionService.isSubscribed(subscription, mockAnime))
+            .assertNext { assertFalse(it) }
+            .verifyComplete()
+
+        subscriptionService.subscribe(subscription, mockAnime).block()
+        StepVerifier.create(subscriptionService.isSubscribed(subscription, mockAnime))
+            .assertNext { assertTrue(it) }
+            .verifyComplete()
+
+    }
+
     private fun mockAnimeProvider(): AnimeProvider {
         return mockk {
             every { findById(444) } returns (
                     Mono.just(
-                        createAnimeMock(
+                        mockAnime(
                             444,
                             NOTICEABLE_TIME,
                             "Onepunch"
@@ -97,7 +111,7 @@ internal open class SubscriptionServiceTest
                     ))
             every { findById(455) } returns (
                     Mono.just(
-                        createAnimeMock(
+                        mockAnime(
                             455,
                             NOT_NOTICEABLE_TIME,
                             "Grandblue"
@@ -118,9 +132,9 @@ internal open class SubscriptionServiceTest
         return Pair(jdaMockk, channelMockk)
     }
 
-    private fun createAnimeMock(
+    private fun mockAnime(
         animeId: Long,
-        nextEp: ZonedDateTime,
+        nextEp: ZonedDateTime? = null,
         animeName: String = "any"
     ): com.nikosar.animeforever.shikimori.Anime {
         return mockk(relaxed = true) {
@@ -132,8 +146,8 @@ internal open class SubscriptionServiceTest
     }
 
     private fun initSubscriptionsForCheck() {
-        val animeWithNotice = createAnimeMock(444L, NOTICEABLE_TIME)
-        val animeWithoutNotice = createAnimeMock(455L, NOT_NOTICEABLE_TIME)
+        val animeWithNotice = mockAnime(444L, NOTICEABLE_TIME)
+        val animeWithoutNotice = mockAnime(455L, NOT_NOTICEABLE_TIME)
         animeService.saveAll(listOf(animeWithNotice, animeWithoutNotice)).blockLast()
         val subs = listOf(
             Subscription(null, 100, 444, 555),

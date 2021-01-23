@@ -77,14 +77,26 @@ private fun watchMessageBuilder(
 }
 
 
-fun subscribeSuccessfulMessage(user: User, anime: Anime): Message = MessageBuilder()
+fun subscribeSuccessful(user: User, anime: Anime): Message = MessageBuilder()
     .setContent("${user.asMention} successfully subscribed to ${anime.name}")
     .build()
 
-fun subscribeAlreadyOutMessage(user: User, anime: Anime): Message = MessageBuilder()
+fun alreadyAired(user: User, anime: Anime): Message = MessageBuilder()
     .setContent("${user.asMention} ${anime.name} is already out")
     .build()
 
 fun subscribePrivateChannel(user: User): Message = MessageBuilder()
     .setContent("${user.asMention} can't subscribe you in private channel, use guild")
+    .build()
+
+fun alreadySubscribed(user: User, anime: Anime): Message = MessageBuilder()
+    .setContent("${user.asMention} you already subscribed to ${anime.name}")
+    .build()
+
+fun unsubscribedSuccessfully(user: User, anime: Anime): Message = MessageBuilder()
+    .setContent("${user.asMention} you unsubscribed from ${anime.name}")
+    .build()
+
+fun alreadyUnsubscribed(user: User, anime: Anime): Message = MessageBuilder()
+    .setContent("${user.asMention} not subscribed to ${anime.name}")
     .build()

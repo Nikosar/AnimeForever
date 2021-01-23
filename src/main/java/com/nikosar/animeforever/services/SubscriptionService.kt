@@ -9,6 +9,7 @@ import com.nikosar.animeforever.shikimori.Anime
 import com.nikosar.animeforever.shikimori.AnimeProvider
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.User
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
@@ -32,6 +33,19 @@ open class SubscriptionService(
     open fun subscribe(subscription: Subscription, anime: Anime): Mono<Subscription> {
         return animeService.saveIfNotExist(anime)
             .flatMap { subscriptionRepository.save(subscription) }
+    }
+
+    open fun isSubscribed(subscription: Subscription, anime: Anime): Mono<Boolean> {
+        return subscriptionRepository.findSubscription(
+            anime.id,
+            subscription.channelId,
+            subscription.userId
+        ).map { true }
+            .defaultIfEmpty(false)
+    }
+
+    open fun unsubscribe(user: User, anime: Anime): Mono<Void> {
+        return subscriptionRepository.deleteAllByUserIdAndAnimeId(user.idLong, anime.id)
     }
 
     @Scheduled(cron = "0 */10 * * * *")

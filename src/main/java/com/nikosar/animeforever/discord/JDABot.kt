@@ -23,10 +23,12 @@ open class JDABot(
     @EventListener(ApplicationReadyEvent::class)
     override fun start() {
         jda.on<MessageReceivedEvent>()
-                .filter { !it.author.isBot }
-                .flatMap { handleMessage(it) }
-                .doOnError { logger.error(it.message) }
-                .subscribe()
+            .filter { !it.author.isBot }
+            .flatMap { handleMessage(it) }
+            .doOnError { logger.error(it.message) }
+            .onErrorContinue { throwable, _ ->
+                logger.error("Unhandled error: ${throwable.message}")
+            }.subscribe()
     }
 
     private fun handleMessage(event: MessageReceivedEvent): Publisher<*> {
