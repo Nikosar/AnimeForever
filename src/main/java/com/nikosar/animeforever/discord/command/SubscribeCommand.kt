@@ -42,7 +42,7 @@ class SubscribeCommand(
             .flatMap { event.channel.sendMessage(it).asMono() }
     }
 
-    private fun tryUnsubscribe(event: MessageReceivedEvent, anime: Anime): Mono<out Message>? {
+    private fun tryUnsubscribe(event: MessageReceivedEvent, anime: Anime): Mono<Message> {
         val user = event.author
         val subscription = createSubscription(user, anime, event)
 
