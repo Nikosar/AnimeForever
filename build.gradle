@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.3.4.RELEASE'
+    id 'org.springframework.boot' version '2.4.2'
     id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.4.10'
@@ -40,6 +40,7 @@ dependencies {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
     testImplementation "io.mockk:mockk:1.10.2"
+    testImplementation "net.bytebuddy:byte-buddy:1.10.2"
     testImplementation('io.projectreactor:reactor-test')
     testImplementation("org.hamcrest:hamcrest-core")
     implementation 'org.modelmapper:modelmapper:2.3.8'

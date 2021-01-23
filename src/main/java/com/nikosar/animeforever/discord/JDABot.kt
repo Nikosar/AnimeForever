@@ -32,7 +32,7 @@ open class JDABot(
     private fun handleMessage(event: MessageReceivedEvent): Publisher<*> {
         return try {
             val messageRaw = event.message.contentRaw
-            logger.info("Received message from ${event.author.name}: $messageRaw")
+            logger.debug("Received message from ${event.author.name}: $messageRaw")
             val allArgs = messageRaw.split(Pattern.compile(" "), 2)
             val command = allArgs[0]
             val args = if (allArgs.size > 1) allArgs[1] else ""

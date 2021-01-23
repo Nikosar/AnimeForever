@@ -35,7 +35,7 @@ open class AnimeForeverApplication {
             .setEventManager(ReactiveEventManager())
             .setActivity(Activity.listening("-help"))
             .setStatus(OnlineStatus.ONLINE)
-            .build()
+            .build().awaitReady()
     }
 
     @Bean

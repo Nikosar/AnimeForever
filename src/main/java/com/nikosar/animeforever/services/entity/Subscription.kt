@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.services
+package com.nikosar.animeforever.services.entity
 
 import org.springframework.data.annotation.Id
 
@@ -7,6 +7,5 @@ data class Subscription(
     var id: Long?,
     var userId: Long,
     var animeId: Long,
-    var isFromGuild: Boolean,
     var channelId: Long
 )

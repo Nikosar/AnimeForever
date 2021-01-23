@@ -1,16 +1,21 @@
 package com.nikosar.animeforever.discord.command
 
+import club.minnced.jda.reactor.asMono
 import com.nikosar.animeforever.discord.command.processor.BotCommand
 import com.nikosar.animeforever.discord.command.processor.BotCommander
-import com.nikosar.animeforever.services.Subscription
+import com.nikosar.animeforever.discord.command.utils.subscribeAlreadyOutMessage
+import com.nikosar.animeforever.discord.command.utils.subscribePrivateChannel
+import com.nikosar.animeforever.discord.command.utils.subscribeSuccessfulMessage
 import com.nikosar.animeforever.services.SubscriptionService
+import com.nikosar.animeforever.services.entity.Subscription
 import com.nikosar.animeforever.shikimori.Anime
 import com.nikosar.animeforever.shikimori.AnimeProvider
 import com.nikosar.animeforever.shikimori.AnimeSearch
+import net.dv8tion.jda.api.entities.ChannelType
+import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import reactor.core.CorePublisher
 import reactor.core.publisher.Mono
-import java.time.ZoneId
 
 @BotCommander
 class SubscribeCommand(
@@ -22,38 +27,28 @@ class SubscribeCommand(
         return animeProvider.search(AnimeSearch(search))
             .filter { it.isNotEmpty() }
             .map { it[0] }
-            .map {
-                subscribe(event, it)
-            }.doOnError { TODO() }
+            .flatMap { animeProvider.findById(it.id) }
+            .flatMap { subscribeController(event, it) }
+            .flatMap { event.channel.sendMessage(it).asMono() }
+            .doOnError { event.channel.sendMessage("nope").asMono() }
     }
 
-    private fun subscribe(event: MessageReceivedEvent, anime: Anime): Mono<Subscription> {
-
+    private fun subscribeController(event: MessageReceivedEvent, anime: Anime): Mono<Message> {
+        if (event.isFromType(ChannelType.PRIVATE)) {
+            return Mono.just(subscribePrivateChannel(event.author))
+        }
+        if (!anime.ongoing || anime.episodes == anime.episodesAired) {
+            return Mono.just(subscribeAlreadyOutMessage(event.author, anime))
+        }
         return subscriptionService.subscribe(
             Subscription(
                 null,
                 event.author.idLong,
                 anime.id,
-                event.isFromGuild,
                 event.channel.idLong,
             ),
-            com.nikosar.animeforever.services.Anime(
-                null, anime.id, anime.nextEpisodeAt
-                    ?.withZoneSameLocal(ZoneId.systemDefault())
-                    ?.toLocalDateTime() ?: TODO()
-            )
-        )
-    }
+            anime
+        ).flatMap { Mono.just(subscribeSuccessfulMessage(event.author, anime)) }
 
-//    private fun subscribeGuild(event: MessageReceivedEvent, anime: Anime) {
-//        subscriptionService.subscribe(
-//            Subscription(
-//                null,
-//                event.author.idLong,
-//                anime.id,
-//                event.isFromGuild,
-//                event.channel.idLong
-//            )
-//        )
-//    }
+    }
 }

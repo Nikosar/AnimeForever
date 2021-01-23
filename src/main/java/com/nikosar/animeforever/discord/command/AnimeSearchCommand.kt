@@ -1,13 +1,10 @@
 package com.nikosar.animeforever.discord.command
 
 import club.minnced.jda.reactor.asMono
-import com.nikosar.animeforever.animesites.OnlineWatchWebsite
 import com.nikosar.animeforever.discord.command.processor.BotCommand
 import com.nikosar.animeforever.discord.command.processor.BotCommander
 import com.nikosar.animeforever.discord.command.processor.Sequential
-import com.nikosar.animeforever.discord.command.utils.animeListMessage
-import com.nikosar.animeforever.discord.command.utils.createFindMessage
-import com.nikosar.animeforever.discord.command.utils.createWatchMessage
+import com.nikosar.animeforever.discord.command.utils.SearchMessageCreator
 import com.nikosar.animeforever.shikimori.*
 import net.dv8tion.jda.api.MessageBuilder
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -18,8 +15,8 @@ import java.time.Year
 
 @BotCommander
 class AnimeSearchCommand(
-        private val animeProvider: AnimeProvider,
-        private val watchSites: Map<String, OnlineWatchWebsite>
+    private val animeProvider: AnimeProvider,
+    private val searchMessageCreator: SearchMessageCreator
 ) {
     @BotCommand(value = ["-f", "find"], description = "find anime with max rating by query")
     fun findAnime(event: MessageReceivedEvent, search: String): Flux<*> =
@@ -29,8 +26,8 @@ class AnimeSearchCommand(
                     .flatMap { animeProvider.findById(it.id) }
                     .flatMapMany {
                         Flux.just(
-                            createFindMessage(it, animeProvider),
-                            createWatchMessage(it, watchSites)
+                            searchMessageCreator.createFindMessage(it),
+                            searchMessageCreator.createWatchMessage(it)
                         )
                     }
                     .defaultIfEmpty(MessageBuilder(CRAB).build())
@@ -48,7 +45,7 @@ class AnimeSearchCommand(
     fun best(event: MessageReceivedEvent, year: Int? = null,
              season: Season? = null, page: Int = 1, size: Int = 20): Mono<*> =
         animeProvider.search(AnimeSearch(season = season, year = year), Page(page, size))
-            .map { animeListMessage(it, page, size) }
+            .map { searchMessageCreator.animeListMessage(it, page, size) }
                     .flatMap { event.channel.sendMessage(it).asMono() }
 
 

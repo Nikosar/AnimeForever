@@ -1,5 +1,6 @@
-package com.nikosar.animeforever.services
+package com.nikosar.animeforever.services.repository
 
+import com.nikosar.animeforever.services.entity.Subscription
 import org.springframework.data.r2dbc.repository.Query
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import reactor.core.publisher.Flux

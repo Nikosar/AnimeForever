@@ -41,8 +41,15 @@ fun <T : MessageChannel> mockSendMessage(channel: T) {
         val future = CompletableFuture<Message>()
         val message = MessageBuilder(call.invocation.args[0] as String).build()
         future.complete(message)
-
+        every { messageAction.submit() } returns future
+        messageAction
+    }
+    every { channel.sendMessage(any<Message>()) } answers { call ->
+        val future = CompletableFuture<Message>()
+        val message = MessageBuilder(call.invocation.args[0] as Message).build()
+        future.complete(message)
         every { messageAction.submit() } returns future
         messageAction
     }
 }
+
