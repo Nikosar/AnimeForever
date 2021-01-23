@@ -34,7 +34,7 @@ open class SubscriptionService(
             .flatMap { subscriptionRepository.save(subscription) }
     }
 
-    @Scheduled(cron = "* */10 * * * *")
+    @Scheduled(cron = "0 */10 * * * *")
     open fun checkReleases() {
         logger.debug("Checking out releases")
         subscriptionRepository.newReleases(LocalDateTime.now())
