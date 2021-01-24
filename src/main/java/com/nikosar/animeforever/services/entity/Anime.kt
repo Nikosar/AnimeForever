@@ -8,12 +8,14 @@ import java.time.ZoneId
 data class Anime(
     @Id
     var id: Long?,
-    var providerId: Long,
-    var nextEpisode: LocalDateTime?
+    val providerId: Long,
+    val noticedEpisode: Int?,
+    val nextEpisode: LocalDateTime?
 ) {
     constructor(anime: Anime) : this(
         null,
         anime.id,
+        anime.episodesAired,
         anime.nextEpisodeAt
             ?.withZoneSameInstant(ZoneId.systemDefault())
             ?.toLocalDateTime()

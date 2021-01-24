@@ -30,8 +30,20 @@ internal class AnimeServiceTest @Autowired constructor(
             .verifyComplete()
     }
 
+    @Test
+    fun getById() {
+        val animeService = AnimeService(animeRepository)
+        val firstDate = ZonedDateTime.now()
+        val anime = anime(firstDate)
+        animeService.save(anime).block()
+        StepVerifier.create(animeService.findByProviderId(113))
+            .assertNext { assertEquals(12, it.noticedEpisode!!) }
+            .verifyComplete()
+    }
+
     private fun anime(zonedDateTime: ZonedDateTime) = mockk<Anime> {
         every { id } returns 113
         every { nextEpisodeAt } returns zonedDateTime
+        every { episodesAired } returns 12
     }
 }

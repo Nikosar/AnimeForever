@@ -1,6 +1,8 @@
 package com.nikosar.animeforever.shikimori
 
 import org.apache.http.client.utils.URIBuilder
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpHeaders.USER_AGENT
@@ -19,11 +21,13 @@ class Shikimori(
         @Value("\${spring.application.name}")
         private val applicationName: String
 ) : AnimeProvider {
+    private val logger: Logger = LoggerFactory.getLogger(Shikimori::class.java)
     private val animeListType = object : ParameterizedTypeReference<List<Anime>>() {}
     private val descriptionLinks = Regex("\\[.+?]")
 
 
     override fun findById(id: Long): Mono<Anime> {
+        logger.debug("Search by id: $id")
         val uri = URIBuilder(shikimori)
                 .setPath("$animes/$id").build()
         return webClient.get().uri(uri)
@@ -38,6 +42,7 @@ class Shikimori(
     }
 
     override fun search(search: AnimeSearch, page: Page): Mono<List<Anime>> {
+        logger.debug("Search by: $search")
         val uri = URIBuilder(shikimori)
                 .setPath(animes)
                 .addParameters(search.toNameValuePairs())

@@ -12,9 +12,11 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.ActiveProfiles
 import java.util.concurrent.CompletableFuture
 
 @SpringBootTest
+@ActiveProfiles("test")
 internal open class AnimeForeverApplicationTests {
     @MockBean
     lateinit var jdaBot: JDABot

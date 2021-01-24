@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.User
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,6 +25,8 @@ open class SubscriptionService(
     private val subscriptionRepository: SubscriptionRepository,
     private val animeService: AnimeService,
     private val animeProvider: AnimeProvider,
+    @Value("\${notification.delay}")
+    private val delay: Long,
     private val watchSites: Map<String, OnlineWatchWebsite>,
     private val jda: JDA
 ) {
@@ -51,21 +54,32 @@ open class SubscriptionService(
     @Scheduled(cron = "0 */10 * * * *")
     open fun checkReleases() {
         logger.debug("Checking out releases")
-        subscriptionRepository.newReleases(LocalDateTime.now())
+        subscriptionRepository.newReleases(LocalDateTime.now().plusMinutes(delay))
             .groupBy { subscription -> subscription.animeId }
-            .flatMap { subscriptionGroup -> messageForAnime(subscriptionGroup) }
+            .flatMap { groupedByAnime -> prepareNotices(groupedByAnime) }
             .subscribe()
     }
 
-    private fun messageForAnime(subscriptionGroup: GroupedFlux<Long, Subscription>) =
-        animeProvider.findById(subscriptionGroup.key() ?: TODO("never?"))
-            .flatMapMany { anime ->
-                animeService.save(anime)
-                    .thenMany(subscriptionGroup.groupBy { it.channelId }
-                        .flatMap { it.collectList() }
-                        .flatMap { createMessage(it, anime) })
-            }
+    private fun prepareNotices(groupedByAnime: GroupedFlux<Long, Subscription>) =
+        animeProvider.findById(groupedByAnime.key())
+            .filterWhen { isNewEpisodeShowed(it) }
+            .doOnNext { anime -> animeService.save(anime) }
+            .flatMapMany { anime -> noticeForChannels(groupedByAnime, anime) }
 
+    private fun isNewEpisodeShowed(anime: Anime): Mono<Boolean> {
+        return animeService.findByProviderId(anime.id)
+            .map { it.noticedEpisode != null && (it.noticedEpisode < anime.episodesAired) }
+    }
+
+    private fun noticeForChannels(
+        groupedByAnime: GroupedFlux<Long, Subscription>,
+        anime: Anime
+    ) = groupedByAnime.groupBy { it.channelId }
+        .flatMap { it.collectList() }
+        .flatMap { createMessage(it, anime) }
+
+
+    //TODO probably move to message creator
     private fun createMessage(
         subscriptionsByChannel: MutableList<Subscription>,
         anime: Anime

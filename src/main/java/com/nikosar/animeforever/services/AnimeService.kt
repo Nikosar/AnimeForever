@@ -24,4 +24,8 @@ class AnimeService(private val animeRepository: AnimeRepository) {
         return animeRepository.findByProviderId(anime.id)
             .switchIfEmpty(animeRepository.save(Anime(anime)))
     }
+
+    fun findByProviderId(id: Long): Mono<Anime> {
+        return animeRepository.findByProviderId(id)
+    }
 }

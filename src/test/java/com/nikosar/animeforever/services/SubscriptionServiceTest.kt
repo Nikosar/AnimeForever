@@ -2,19 +2,17 @@ package com.nikosar.animeforever.services
 
 import com.nikosar.animeforever.AnimeForeverApplicationTests
 import com.nikosar.animeforever.animesites.OnlineWatchWebsite
-import com.nikosar.animeforever.mockSendMessage
 import com.nikosar.animeforever.services.entity.Subscription
 import com.nikosar.animeforever.services.repository.SubscriptionRepository
-import com.nikosar.animeforever.shikimori.AnimeProvider
-import io.mockk.*
-import net.dv8tion.jda.api.JDA
+import io.mockk.confirmVerified
+import io.mockk.excludeRecords
+import io.mockk.spyk
+import io.mockk.verify
 import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.TextChannel
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -66,25 +64,6 @@ internal open class SubscriptionServiceTest
     }
 
     @Test
-    fun checkReleasesSuccessful() {
-        initSubscriptionsForCheck()
-        val animeProvider = mockAnimeProvider()
-        val animeService = spyk(this.animeService)
-        val (jda, channel) = mockJda()
-        SubscriptionService(subscriptionRepository, animeService, animeProvider, watchSites, jda)
-            .checkReleases()
-        verify { animeProvider.findById(444) }
-        verify { jda.getTextChannelById(555) }
-        verify { jda.getTextChannelById(600) }
-        verify(exactly = 2) { channel.sendMessage(any<Message>()) }
-        verify { animeService.save(any()) }
-        excludeRecords { channel.guild }
-        excludeRecords { channel.name }
-
-        confirmVerified(animeProvider, jda, channel)
-    }
-
-    @Test
     fun isSubscribed() {
         val mockAnime = mockAnime(1)
         val subscription = Subscription(null, 1, 1, 1)
@@ -99,61 +78,38 @@ internal open class SubscriptionServiceTest
 
     }
 
-    private fun mockAnimeProvider(): AnimeProvider {
-        return mockk {
-            every { findById(444) } returns (
-                    Mono.just(
-                        mockAnime(
-                            444,
-                            NOTICEABLE_TIME,
-                            "Onepunch"
-                        )
-                    ))
-            every { findById(455) } returns (
-                    Mono.just(
-                        mockAnime(
-                            455,
-                            NOT_NOTICEABLE_TIME,
-                            "Grandblue"
-                        )
-                    ))
-        }
-    }
+    @Test
+    fun checkReleasesSuccessful() {
+        initSubscriptionsForCheck()
+        val animeProvider = mockAnimeProvider()
+        val animeService = spyk(this.animeService)
+        val (jda, channel) = mockJda()
+        SubscriptionService(subscriptionRepository, animeService, animeProvider, 10, watchSites, jda)
+            .checkReleases()
+        verify { animeProvider.findById(ANIME_ID_CALLED) }
+        verify { animeProvider.findById(ANIME_ID_EPISODE_NOT_RELEASED) }
+        verify { jda.getTextChannelById(CHANNEL_ID_555) }
+        verify { jda.getTextChannelById(CHANNEL_ID_555) }
+        verify { jda.getTextChannelById(CHANNEL_ID_600) }
+        verify(exactly = 2) { channel.sendMessage(any<Message>()) }
+        verify { animeService.save(any()) }
+        excludeRecords { channel.guild }
+        excludeRecords { channel.name }
 
-    private fun mockJda(): Pair<JDA, TextChannel> {
-        val channelMockk = mockk<TextChannel> {
-            mockSendMessage(this)
-            every { guild } returns mockk(relaxed = true)
-            every { name } returns "channel"
-        }
-        val jdaMockk = mockk<JDA> {
-            every { getTextChannelById(any<Long>()) } returns channelMockk
-        }
-        return Pair(jdaMockk, channelMockk)
-    }
-
-    private fun mockAnime(
-        animeId: Long,
-        nextEp: ZonedDateTime? = null,
-        animeName: String = "any"
-    ): com.nikosar.animeforever.shikimori.Anime {
-        return mockk(relaxed = true) {
-            every { id } returns animeId
-            every { name } returns animeName
-            every { russian } returns animeName
-            every { nextEpisodeAt } returns nextEp
-        }
+        confirmVerified(animeProvider, jda, channel)
     }
 
     private fun initSubscriptionsForCheck() {
-        val animeWithNotice = mockAnime(444L, NOTICEABLE_TIME)
-        val animeWithoutNotice = mockAnime(455L, NOT_NOTICEABLE_TIME)
-        animeService.saveAll(listOf(animeWithNotice, animeWithoutNotice)).blockLast()
+        val animeWithNotice = mockAnime(ANIME_ID_CALLED, NOTICEABLE_TIME, episodesAiredNum = 1)
+        val animeWithoutNotice = mockAnime(ANIME_ID_NOT_CALLED, NOT_NOTICEABLE_TIME)
+        val animeNotYetReleased = mockAnime(ANIME_ID_EPISODE_NOT_RELEASED, NOTICEABLE_TIME)
+        animeService.saveAll(listOf(animeWithNotice, animeWithoutNotice, animeNotYetReleased)).blockLast()
         val subs = listOf(
-            Subscription(null, 100, 444, 555),
-            Subscription(null, 101, 444, 555),
-            Subscription(null, 102, 444, 600),
-            Subscription(null, 103, 455, 555),
+            Subscription(null, 100, ANIME_ID_CALLED, CHANNEL_ID_555),
+            Subscription(null, 101, ANIME_ID_CALLED, CHANNEL_ID_555),
+            Subscription(null, 102, ANIME_ID_CALLED, CHANNEL_ID_600),
+            Subscription(null, 103, ANIME_ID_NOT_CALLED, CHANNEL_ID_555),
+            Subscription(null, 104, ANIME_ID_EPISODE_NOT_RELEASED, CHANNEL_ID_556),
         )
         subscriptionRepository.saveAll(subs).blockLast()
     }
@@ -161,5 +117,14 @@ internal open class SubscriptionServiceTest
 
 }
 
-private val NOTICEABLE_TIME = LocalDateTime.now().minusHours(1L).atZone(ZoneId.systemDefault())
-private val NOT_NOTICEABLE_TIME = LocalDateTime.now().plusDays(1L).atZone(ZoneId.systemDefault())
+const val ANIME_ID_CALLED = 444L
+const val ANIME_ID_NOT_CALLED = 455L
+const val ANIME_ID_EPISODE_NOT_RELEASED = 465L
+
+
+const val CHANNEL_ID_555 = 555L
+const val CHANNEL_ID_556 = 556L
+const val CHANNEL_ID_600 = 600L
+
+val NOTICEABLE_TIME: ZonedDateTime = LocalDateTime.now().minusHours(1L).atZone(ZoneId.systemDefault())
+val NOT_NOTICEABLE_TIME: ZonedDateTime = LocalDateTime.now().plusDays(1L).atZone(ZoneId.systemDefault())

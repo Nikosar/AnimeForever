@@ -1,8 +1,9 @@
 CREATE TABLE if not exists anime
 (
-    id           SERIAL PRIMARY KEY,
-    provider_id  BIGINT not null,
-    next_episode datetime
+    id              SERIAL PRIMARY KEY,
+    provider_id     BIGINT not null,
+    noticed_episode int,
+    next_episode    datetime
 );
 
 CREATE TABLE if not exists subscription
