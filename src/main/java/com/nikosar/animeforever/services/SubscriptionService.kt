@@ -51,7 +51,7 @@ open class SubscriptionService(
         return subscriptionRepository.deleteAllByUserIdAndAnimeId(user.idLong, anime.id)
     }
 
-    @Scheduled(cron = "*/10 * * * * *")
+    @Scheduled(cron = "0 */10 * * * *")
     open fun checkReleases() {
         logger.debug("Checking out releases")
         subscriptionRepository.newReleases(LocalDateTime.now().plusMinutes(delay))
