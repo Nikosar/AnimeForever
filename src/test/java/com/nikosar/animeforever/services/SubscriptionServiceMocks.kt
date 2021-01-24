@@ -1,42 +1,24 @@
 package com.nikosar.animeforever.services
 
+import club.minnced.jda.reactor.toMono
 import com.nikosar.animeforever.mockSendMessage
 import com.nikosar.animeforever.shikimori.AnimeProvider
 import io.mockk.every
 import io.mockk.mockk
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.TextChannel
-import reactor.core.publisher.Mono
 import java.time.ZonedDateTime
 
 fun mockAnimeProvider(): AnimeProvider {
     return mockk {
         every { findById(ANIME_ID_CALLED) } returns (
-                Mono.just(
-                    mockAnime(
-                        ANIME_ID_CALLED,
-                        NOTICEABLE_TIME,
-                        "Onepunch",
-                        2
-                    )
-                ))
+                mockAnime(ANIME_ID_CALLED, NOTICEABLE_TIME, episodesAiredNum = 2)).toMono()
+
         every { findById(ANIME_ID_NOT_CALLED) } returns (
-                Mono.just(
-                    mockAnime(
-                        ANIME_ID_NOT_CALLED,
-                        NOT_NOTICEABLE_TIME,
-                        "Grandblue"
-                    )
-                ))
+                mockAnime(ANIME_ID_NOT_CALLED, NOT_NOTICEABLE_TIME)).toMono()
+
         every { findById(ANIME_ID_EPISODE_NOT_RELEASED) } returns (
-                Mono.just(
-                    mockAnime(
-                        ANIME_ID_EPISODE_NOT_RELEASED,
-                        NOT_NOTICEABLE_TIME,
-                        "Grandblue",
-                        1
-                    )
-                ))
+                mockAnime(ANIME_ID_EPISODE_NOT_RELEASED, NOT_NOTICEABLE_TIME, episodesAiredNum = 1)).toMono()
     }
 }
 

@@ -51,7 +51,7 @@ open class SubscriptionService(
         return subscriptionRepository.deleteAllByUserIdAndAnimeId(user.idLong, anime.id)
     }
 
-    @Scheduled(cron = "0 */10 * * * *")
+    @Scheduled(cron = "*/10 * * * * *")
     open fun checkReleases() {
         logger.debug("Checking out releases")
         subscriptionRepository.newReleases(LocalDateTime.now().plusMinutes(delay))
@@ -63,7 +63,7 @@ open class SubscriptionService(
     private fun prepareNotices(groupedByAnime: GroupedFlux<Long, Subscription>) =
         animeProvider.findById(groupedByAnime.key())
             .filterWhen { isNewEpisodeShowed(it) }
-            .doOnNext { anime -> animeService.save(anime) }
+            .flatMap { anime -> animeService.save(anime).thenReturn(anime) }
             .flatMapMany { anime -> noticeForChannels(groupedByAnime, anime) }
 
     private fun isNewEpisodeShowed(anime: Anime): Mono<Boolean> {

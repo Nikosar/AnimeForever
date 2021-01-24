@@ -1,13 +1,13 @@
 package com.nikosar.animeforever.services
 
+import club.minnced.jda.reactor.toMono
 import com.nikosar.animeforever.AnimeForeverApplicationTests
 import com.nikosar.animeforever.animesites.OnlineWatchWebsite
 import com.nikosar.animeforever.services.entity.Subscription
+import com.nikosar.animeforever.services.repository.AnimeRepository
 import com.nikosar.animeforever.services.repository.SubscriptionRepository
-import io.mockk.confirmVerified
-import io.mockk.excludeRecords
-import io.mockk.spyk
-import io.mockk.verify
+import com.nikosar.animeforever.shikimori.AnimeProvider
+import io.mockk.*
 import net.dv8tion.jda.api.entities.Message
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
@@ -22,6 +22,7 @@ internal open class SubscriptionServiceTest
 @Autowired constructor(
     private val subscriptionService: SubscriptionService,
     private val subscriptionRepository: SubscriptionRepository,
+    private val animeRepository: AnimeRepository,
     private val animeService: AnimeService,
     private val watchSites: Map<String, OnlineWatchWebsite>
 ) : AnimeForeverApplicationTests() {
@@ -30,6 +31,9 @@ internal open class SubscriptionServiceTest
     fun init() {
         subscriptionRepository.findAll()
             .flatMap { subscriptionRepository.delete(it) }
+            .blockLast()
+        animeRepository.findAll()
+            .flatMap { animeRepository.delete(it) }
             .blockLast()
     }
 
@@ -82,7 +86,6 @@ internal open class SubscriptionServiceTest
     fun checkReleasesSuccessful() {
         initSubscriptionsForCheck()
         val animeProvider = mockAnimeProvider()
-        val animeService = spyk(this.animeService)
         val (jda, channel) = mockJda()
         SubscriptionService(subscriptionRepository, animeService, animeProvider, 10, watchSites, jda)
             .checkReleases()
@@ -92,12 +95,33 @@ internal open class SubscriptionServiceTest
         verify { jda.getTextChannelById(CHANNEL_ID_555) }
         verify { jda.getTextChannelById(CHANNEL_ID_600) }
         verify(exactly = 2) { channel.sendMessage(any<Message>()) }
-        verify { animeService.save(any()) }
         excludeRecords { channel.guild }
         excludeRecords { channel.name }
 
         confirmVerified(animeProvider, jda, channel)
     }
+
+    @Test
+    fun checkAnimeUpdatedAfterRelease() {
+        initSubscriptionsForCheck()
+        val nextEp = ZonedDateTime.now().plusDays(7)
+        val animeProvider = mockk<AnimeProvider> {
+            every { findById(ANIME_ID_CALLED) } returns
+                    mockAnime(ANIME_ID_CALLED, nextEp, episodesAiredNum = 2).toMono()
+            every { findById(ANIME_ID_EPISODE_NOT_RELEASED) } returns
+                    mockAnime(ANIME_ID_CALLED, episodesAiredNum = 1).toMono()
+        }
+        val (jda, channel) = mockJda()
+        SubscriptionService(subscriptionRepository, animeService, animeProvider, 10, watchSites, jda)
+            .checkReleases()
+
+        verify(exactly = 2) { channel.sendMessage(any<Message>()) }
+
+        StepVerifier.create(animeService.findByProviderId(ANIME_ID_CALLED))
+            .assertNext { assertEquals(nextEp.dayOfYear, it.nextEpisode!!.dayOfYear) }
+            .verifyComplete()
+    }
+
 
     private fun initSubscriptionsForCheck() {
         val animeWithNotice = mockAnime(ANIME_ID_CALLED, NOTICEABLE_TIME, episodesAiredNum = 1)
