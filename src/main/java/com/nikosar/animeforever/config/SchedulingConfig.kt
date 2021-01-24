@@ -6,6 +6,6 @@ import org.springframework.scheduling.annotation.EnableScheduling
 
 @Configuration
 @EnableScheduling
-@Profile("dev", "default")
+@Profile("dev", "default", "bot")
 open class SchedulingConfig {
 }
