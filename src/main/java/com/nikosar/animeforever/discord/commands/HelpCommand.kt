@@ -1,8 +1,8 @@
-package com.nikosar.animeforever.discord.command
+package com.nikosar.animeforever.discord.commands
 
 import club.minnced.jda.reactor.asMono
-import com.nikosar.animeforever.discord.command.processor.BotCommand
-import com.nikosar.animeforever.discord.command.processor.BotCommander
+import com.nikosar.animeforever.discord.commandapi.api.BotCommand
+import com.nikosar.animeforever.discord.commandapi.api.BotCommander
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.springframework.beans.factory.getBeansWithAnnotation
 import org.springframework.context.ApplicationContext

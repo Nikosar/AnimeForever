@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.services.entity
+package com.nikosar.animeforever.discord.services.entity
 
 import com.nikosar.animeforever.shikimori.Anime
 import org.springframework.data.annotation.Id

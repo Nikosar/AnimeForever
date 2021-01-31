@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.discord.command.processor
+package com.nikosar.animeforever.discord.commandapi.api
 
 import org.springframework.boot.context.event.ApplicationStartedEvent
 import org.springframework.context.ApplicationContext

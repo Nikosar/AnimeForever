@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.discord
+package com.nikosar.animeforever.discord.util
 
 fun StringBuilder.appendLink(name: String, url: String) {
     append("[${name}](${url})")

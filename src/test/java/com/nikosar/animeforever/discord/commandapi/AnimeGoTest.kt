@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.discord.command
+package com.nikosar.animeforever.discord.commandapi
 
 import com.nikosar.animeforever.animesites.AnimeGo
 import org.junit.jupiter.api.Assertions.assertEquals

@@ -52,5 +52,5 @@ class Shikimori(
                 .retrieve().bodyToMono(animeListType)
     }
 
-    override fun makeUrlFrom(animeUrl: String?) = if (animeUrl != null) shikimori + animeUrl else null
+    override fun makeUrlFrom(relative: String?) = if (relative != null) shikimori + relative else null
 }

@@ -1,8 +1,8 @@
-package com.nikosar.animeforever.discord.command
+package com.nikosar.animeforever.discord.commandapi
 
-import com.nikosar.animeforever.discord.command.processor.BotCommand
-import com.nikosar.animeforever.discord.command.processor.BotCommander
-import com.nikosar.animeforever.discord.command.processor.Sequential
+import com.nikosar.animeforever.discord.commandapi.api.BotCommand
+import com.nikosar.animeforever.discord.commandapi.api.BotCommander
+import com.nikosar.animeforever.discord.commandapi.api.Sequential
 import com.nikosar.animeforever.shikimori.Season
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import reactor.core.publisher.Mono

@@ -1,7 +1,7 @@
-package com.nikosar.animeforever.services
+package com.nikosar.animeforever.discord.services
 
-import com.nikosar.animeforever.services.entity.Anime
-import com.nikosar.animeforever.services.repository.AnimeRepository
+import com.nikosar.animeforever.discord.services.entity.Anime
+import com.nikosar.animeforever.discord.services.repository.AnimeRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux

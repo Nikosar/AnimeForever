@@ -19,6 +19,8 @@ fun mockAnimeProvider(): AnimeProvider {
 
         every { findById(ANIME_ID_EPISODE_NOT_RELEASED) } returns (
                 mockAnime(ANIME_ID_EPISODE_NOT_RELEASED, NOT_NOTICEABLE_TIME, episodesAiredNum = 1)).toMono()
+
+        every { makeUrlFrom(any()) } returns "http://localhost.com"
     }
 }
 

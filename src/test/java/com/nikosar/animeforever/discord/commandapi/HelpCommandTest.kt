@@ -1,6 +1,7 @@
-package com.nikosar.animeforever.discord.command
+package com.nikosar.animeforever.discord.commandapi
 
 import com.nikosar.animeforever.AnimeForeverApplicationTests
+import com.nikosar.animeforever.discord.commands.HelpCommand
 import com.nikosar.animeforever.mockEvent
 import net.dv8tion.jda.api.entities.Message
 import org.hamcrest.CoreMatchers.containsString

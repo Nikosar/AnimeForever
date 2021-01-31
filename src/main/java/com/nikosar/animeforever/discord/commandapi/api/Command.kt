@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.discord.command.processor
+package com.nikosar.animeforever.discord.commandapi.api
 
 import net.dv8tion.jda.api.events.Event
 import org.reactivestreams.Publisher

@@ -1,6 +1,6 @@
-package com.nikosar.animeforever.services.repository
+package com.nikosar.animeforever.discord.services.repository
 
-import com.nikosar.animeforever.services.entity.Anime
+import com.nikosar.animeforever.discord.services.entity.Anime
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import reactor.core.publisher.Mono
 

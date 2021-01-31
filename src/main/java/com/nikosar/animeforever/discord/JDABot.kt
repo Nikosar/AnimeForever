@@ -1,7 +1,7 @@
 package com.nikosar.animeforever.discord
 
 import club.minnced.jda.reactor.on
-import com.nikosar.animeforever.discord.command.processor.CommandFactory
+import com.nikosar.animeforever.discord.commandapi.api.CommandFactory
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import org.reactivestreams.Publisher

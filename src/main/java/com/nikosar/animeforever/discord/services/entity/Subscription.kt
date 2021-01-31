@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.services.entity
+package com.nikosar.animeforever.discord.services.entity
 
 import org.springframework.data.annotation.Id
 

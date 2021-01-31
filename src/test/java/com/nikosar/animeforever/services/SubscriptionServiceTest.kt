@@ -3,9 +3,11 @@ package com.nikosar.animeforever.services
 import club.minnced.jda.reactor.toMono
 import com.nikosar.animeforever.AnimeForeverApplicationTests
 import com.nikosar.animeforever.animesites.OnlineWatchWebsite
-import com.nikosar.animeforever.services.entity.Subscription
-import com.nikosar.animeforever.services.repository.AnimeRepository
-import com.nikosar.animeforever.services.repository.SubscriptionRepository
+import com.nikosar.animeforever.discord.services.AnimeService
+import com.nikosar.animeforever.discord.services.SubscriptionService
+import com.nikosar.animeforever.discord.services.entity.Subscription
+import com.nikosar.animeforever.discord.services.repository.AnimeRepository
+import com.nikosar.animeforever.discord.services.repository.SubscriptionRepository
 import com.nikosar.animeforever.shikimori.AnimeProvider
 import io.mockk.*
 import net.dv8tion.jda.api.entities.Message
@@ -97,6 +99,7 @@ internal open class SubscriptionServiceTest
         verify(exactly = 2) { channel.sendMessage(any<Message>()) }
         excludeRecords { channel.guild }
         excludeRecords { channel.name }
+        excludeRecords { animeProvider.makeUrlFrom(any()) }
 
         confirmVerified(animeProvider, jda, channel)
     }
@@ -110,6 +113,7 @@ internal open class SubscriptionServiceTest
                     mockAnime(ANIME_ID_CALLED, nextEp, episodesAiredNum = 2).toMono()
             every { findById(ANIME_ID_EPISODE_NOT_RELEASED) } returns
                     mockAnime(ANIME_ID_CALLED, episodesAiredNum = 1).toMono()
+            every { makeUrlFrom(any()) } returns "http://localhost.com"
         }
         val (jda, channel) = mockJda()
         SubscriptionService(subscriptionRepository, animeService, animeProvider, 10, watchSites, jda)

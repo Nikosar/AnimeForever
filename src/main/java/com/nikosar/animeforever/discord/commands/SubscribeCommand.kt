@@ -1,12 +1,12 @@
-package com.nikosar.animeforever.discord.command
+package com.nikosar.animeforever.discord.commands
 
 import club.minnced.jda.reactor.asMono
 import club.minnced.jda.reactor.toMono
-import com.nikosar.animeforever.discord.command.processor.BotCommand
-import com.nikosar.animeforever.discord.command.processor.BotCommander
-import com.nikosar.animeforever.discord.command.utils.*
-import com.nikosar.animeforever.services.SubscriptionService
-import com.nikosar.animeforever.services.entity.Subscription
+import com.nikosar.animeforever.discord.commandapi.api.BotCommand
+import com.nikosar.animeforever.discord.commandapi.api.BotCommander
+import com.nikosar.animeforever.discord.messages.*
+import com.nikosar.animeforever.discord.services.SubscriptionService
+import com.nikosar.animeforever.discord.services.entity.Subscription
 import com.nikosar.animeforever.shikimori.Anime
 import com.nikosar.animeforever.shikimori.AnimeProvider
 import com.nikosar.animeforever.shikimori.AnimeSearch
@@ -37,9 +37,15 @@ class SubscribeCommand(
         return animeProvider.search(AnimeSearch(search))
             .filter { it.isNotEmpty() }
             .map { it[0] }
-            .flatMap { animeProvider.findById(it.id) }
             .flatMap { tryUnsubscribe(event, it) }
             .flatMap { event.channel.sendMessage(it).asMono() }
+    }
+
+    //    @BotCommand(["sublist", "subl"], description = "Shows list of your subscriptions  subl [page]")
+//    @Sequential
+    fun list(event: MessageReceivedEvent, page: Int) {
+//        return subscriptionService.list(event.author, page)
+
     }
 
     private fun tryUnsubscribe(event: MessageReceivedEvent, anime: Anime): Mono<Message> {

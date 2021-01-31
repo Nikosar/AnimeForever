@@ -1,10 +1,10 @@
-package com.nikosar.animeforever.services
+package com.nikosar.animeforever.discord.services
 
 import club.minnced.jda.reactor.asMono
 import com.nikosar.animeforever.animesites.OnlineWatchWebsite
-import com.nikosar.animeforever.discord.command.utils.newEpisodeIsOut
-import com.nikosar.animeforever.services.entity.Subscription
-import com.nikosar.animeforever.services.repository.SubscriptionRepository
+import com.nikosar.animeforever.discord.messages.newEpisodeIsOut
+import com.nikosar.animeforever.discord.services.entity.Subscription
+import com.nikosar.animeforever.discord.services.repository.SubscriptionRepository
 import com.nikosar.animeforever.shikimori.Anime
 import com.nikosar.animeforever.shikimori.AnimeProvider
 import net.dv8tion.jda.api.JDA
@@ -87,7 +87,7 @@ open class SubscriptionService(
         val channelId = subscriptionsByChannel.first().channelId
         val usersMentions = usersMentions(subscriptionsByChannel)
         val createWatchMessageWithMentions =
-            newEpisodeIsOut(usersMentions, anime, watchSites)
+            newEpisodeIsOut(usersMentions, anime, animeProvider, watchSites)
         val textChannelById = jda.getTextChannelById(channelId)
         if (textChannelById == null) {
             logger.info("Can't access text channel with id: $channelId")
@@ -102,4 +102,10 @@ open class SubscriptionService(
         subscriptionsByChannel
             .map { "<@${it.userId}>" }
             .joinToString(" ") { it }
+
+    fun list(user: User, page: Int) {
+        subscriptionRepository.findAll()
+//            .grou
+
+    }
 }

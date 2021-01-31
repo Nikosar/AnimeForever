@@ -1,7 +1,8 @@
 package com.nikosar.animeforever.services
 
 import com.nikosar.animeforever.AnimeForeverApplicationTests
-import com.nikosar.animeforever.services.repository.AnimeRepository
+import com.nikosar.animeforever.discord.services.AnimeService
+import com.nikosar.animeforever.discord.services.repository.AnimeRepository
 import com.nikosar.animeforever.shikimori.Anime
 import io.mockk.every
 import io.mockk.mockk

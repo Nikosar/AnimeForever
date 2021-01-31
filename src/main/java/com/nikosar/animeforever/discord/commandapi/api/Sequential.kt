@@ -1,4 +1,4 @@
-package com.nikosar.animeforever.discord.command.processor
+package com.nikosar.animeforever.discord.commandapi.api
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
