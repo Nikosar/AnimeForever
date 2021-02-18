@@ -105,14 +105,14 @@ internal open class SubscriptionServiceTest
     }
 
     @Test
-    fun checkAnimeUpdatedAfterRelease() {
+    fun checkAnimeUpdated() {
         initSubscriptionsForCheck()
         val nextEp = ZonedDateTime.now().plusDays(7)
         val animeProvider = mockk<AnimeProvider> {
             every { findById(ANIME_ID_CALLED) } returns
                     mockAnime(ANIME_ID_CALLED, nextEp, episodesAiredNum = 2).toMono()
             every { findById(ANIME_ID_EPISODE_NOT_RELEASED) } returns
-                    mockAnime(ANIME_ID_CALLED, episodesAiredNum = 1).toMono()
+                    mockAnime(ANIME_ID_EPISODE_NOT_RELEASED, episodesAiredNum = 1).toMono()
             every { makeUrlFrom(any()) } returns "http://localhost.com"
         }
         val (jda, channel) = mockJda()
