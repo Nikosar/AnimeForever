@@ -1,6 +1,7 @@
 package com.nikosar.animeforever.discord.services
 
 import club.minnced.jda.reactor.asMono
+import club.minnced.jda.reactor.toMono
 import com.nikosar.animeforever.animesites.OnlineWatchWebsite
 import com.nikosar.animeforever.discord.messages.newEpisodeIsOut
 import com.nikosar.animeforever.discord.services.entity.Subscription
@@ -51,7 +52,7 @@ open class SubscriptionService(
         return subscriptionRepository.deleteAllByUserIdAndAnimeId(user.idLong, anime.id)
     }
 
-    @Scheduled(cron = "0 */30 * * * *")
+    @Scheduled(cron = "0 */10 * * * *")
     open fun checkReleases() {
         logger.debug("Checking out releases")
         subscriptionRepository.newReleases(LocalDateTime.now().plusMinutes(delay))
@@ -62,14 +63,18 @@ open class SubscriptionService(
 
     private fun prepareNotices(groupedByAnime: GroupedFlux<Long, Subscription>) =
         animeProvider.findById(groupedByAnime.key())
-            .flatMap { anime -> animeService.save(anime).thenReturn(anime) }
-            .filterWhen { isNewEpisodeReleased(it) }
-            .flatMapMany { anime -> noticeForChannels(groupedByAnime, anime) }
+            .flatMap { anime ->
+                animeService.findByProviderId(anime.id)
+                    .flatMap { Pair(anime, it).toMono() }
+            }
+            .flatMap { pair -> animeService.save(pair.first).thenReturn(pair) }
+            .filterWhen { (anime, dbAnime) -> (isNewEpisodeReleased(dbAnime, anime)).toMono() }
+            .flatMapMany { (anime) -> noticeForChannels(groupedByAnime, anime) }
 
-    private fun isNewEpisodeReleased(anime: Anime): Mono<Boolean> {
-        return animeService.findByProviderId(anime.id)
-            .map { it.noticedEpisode != null && (it.noticedEpisode < anime.episodesAired) }
-    }
+    private fun isNewEpisodeReleased(
+        dbAnime: com.nikosar.animeforever.discord.services.entity.Anime,
+        anime: Anime
+    ) = dbAnime.noticedEpisode != null && (dbAnime.noticedEpisode < anime.episodesAired)
 
     private fun noticeForChannels(
         groupedByAnime: GroupedFlux<Long, Subscription>,
