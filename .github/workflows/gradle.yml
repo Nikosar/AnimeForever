@@ -25,5 +25,18 @@ jobs:
       run: chmod +x gradlew
     - name: Add secret
       run: echo discord.bot.token=xxx >> src/main/resources/secret.properties
+    - name: Cache Gradle packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Cleanup Gradle Cache
+      run: |
+        rm -f ~/.gradle/caches/modules-2/modules-2.lock
+        rm -f ~/.gradle/caches/modules-2/gc.properties
