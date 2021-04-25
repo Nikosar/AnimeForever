@@ -24,7 +24,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Add secret
-      run: echo discord.bot.token=xxx >> src/main/resources/secret.properties
+      run: echo discord.bot.token=${{ discord_token }} >> src/main/resources/secret.properties
     - name: Cache Gradle packages
       uses: actions/cache@v2
       with:
