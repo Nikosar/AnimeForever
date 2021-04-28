@@ -60,6 +60,6 @@ jobs:
         SOURCE: build/libs/
         # Target directory
         TARGET: ${{ secrets.deploy_target }}
-    - name: ssh
+    - name: start service
       run: ssh ${{ secrets.ssh_user }}@${{ secrets.ssh_host }} pwd
     
