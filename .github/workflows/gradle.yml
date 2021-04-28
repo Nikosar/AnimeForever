@@ -61,7 +61,7 @@ jobs:
         # Target directory
         TARGET: ${{ secrets.deploy_target }}
     - name: start service 
-      run: ls ~/.ssh
+      run: ls ~/.ssh/
     - name: start service 
-      run: ssh ${{ secrets.ssh_user }}@${{ secrets.ssh_host }} pwd
+      run: ssh ${{ secrets.ssh_user }}@${{ secrets.ssh_host }} -i ~/.ssh/deploy_key pwd
     
