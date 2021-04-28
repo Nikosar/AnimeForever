@@ -57,7 +57,7 @@ jobs:
         # Remote port
         REMOTE_PORT: ${{ secrets.ssh_port }}
         # Source directory
-        SOURCE: src#build/libs/
+        SOURCE: src #build/libs/
         # Target directory
         TARGET: ${{ secrets.deploy_target }}
     - name: start service 
