@@ -1,0 +1,66 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Build and deploy master
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up JDK 8 
+      uses: actions/setup-java@v2
+      with:
+        java-version: '8'
+        distribution: 'adopt'
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Add secret
+      run: echo discord.bot.token=${{ secrets.discord_token }} >> src/main/resources/secret.properties
+      
+    - name: Cache Gradle packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Build with Gradle
+      run: ./gradlew build
+      
+    - name: Cleanup Gradle Cache
+      run: |
+        rm -f ~/.gradle/caches/modules-2/modules-2.lock
+        rm -f ~/.gradle/caches/modules-2/gc.properties
+        
+    - uses: actions/upload-artifact@v2.2.3
+      with:
+        name: Package
+        path: build/libs
+        
+    - name: ssh deploy
+      uses: easingthemes/ssh-deploy@v2
+      with:
+        SSH_PRIVATE_KEY: ${{ secrets.ssh_key }}
+        ARGS: "-rltgoDzvO --delete"
+        REMOTE_HOST: ${{ secrets.ssh_host }}
+        REMOTE_USER: ${{ secrets.ssh_user }}
+        REMOTE_PORT: ${{ secrets.ssh_port }}
+        SOURCE: build/libs/
+        TARGET: ${{ secrets.deploy_target }}
+        
+    - name: restart service
+      run: ssh ${{ secrets.ssh_user }}@${{ secrets.ssh_host }} -i ~/.ssh/deploy_key sudo systemctl restart anime-forever
+    
