@@ -25,25 +25,25 @@ jobs:
       run: chmod +x gradlew
     - name: Add secret
       run: echo discord.bot.token=${{ secrets.discord_token }} >> src/main/resources/secret.properties
-#     - name: Cache Gradle packages
-#       uses: actions/cache@v2
-#       with:
-#         path: |
-#           ~/.gradle/caches
-#           ~/.gradle/wrapper
-#         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-#         restore-keys: |
-#           ${{ runner.os }}-gradle-
-#     - name: Build with Gradle
-#       run: ./gradlew build
-#     - name: Cleanup Gradle Cache
-#       run: |
-#         rm -f ~/.gradle/caches/modules-2/modules-2.lock
-#         rm -f ~/.gradle/caches/modules-2/gc.properties
-#     - uses: actions/upload-artifact@v2.2.3
-#       with:
-#         name: Package
-#         path: build/libs
+    - name: Cache Gradle packages
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    - name: Build with Gradle
+      run: ./gradlew build
+    - name: Cleanup Gradle Cache
+      run: |
+        rm -f ~/.gradle/caches/modules-2/modules-2.lock
+        rm -f ~/.gradle/caches/modules-2/gc.properties
+    - uses: actions/upload-artifact@v2.2.3
+      with:
+        name: Package
+        path: build/libs
     - name: ssh deploy
       uses: easingthemes/ssh-deploy@v2
       with:
@@ -57,11 +57,9 @@ jobs:
         # Remote port
         REMOTE_PORT: ${{ secrets.ssh_port }}
         # Source directory
-        SOURCE: src #build/libs/
+        SOURCE: build/libs/
         # Target directory
         TARGET: ${{ secrets.deploy_target }}
-    - name: start service 
-      run: ls ~/.ssh/
-    - name: start service 
-      run: ssh ${{ secrets.ssh_user }}@${{ secrets.ssh_host }} -i ~/.ssh/deploy_key pwd
+    - name: start service
+      run: ssh ${{ secrets.ssh_user }}@${{ secrets.ssh_host }} -i ~/.ssh/deploy_key sudo systemctl restart anime-forever
     
