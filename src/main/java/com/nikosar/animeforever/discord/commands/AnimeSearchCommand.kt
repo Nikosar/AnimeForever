@@ -6,7 +6,7 @@ import com.nikosar.animeforever.discord.commandapi.api.BotCommand
 import com.nikosar.animeforever.discord.commandapi.api.BotCommander
 import com.nikosar.animeforever.discord.commandapi.api.Sequential
 import com.nikosar.animeforever.discord.messages.animeListMessage
-import com.nikosar.animeforever.discord.messages.createFindMessage
+import com.nikosar.animeforever.discord.messages.createFindResultMessage
 import com.nikosar.animeforever.discord.messages.createWatchMessage
 import com.nikosar.animeforever.shikimori.*
 import net.dv8tion.jda.api.MessageBuilder
@@ -29,7 +29,7 @@ class AnimeSearchCommand(
                     .flatMap { animeProvider.findById(it.id) }
                     .flatMapMany {
                         Flux.just(
-                            createFindMessage(it, animeProvider),
+                            createFindResultMessage(it, animeProvider),
                             createWatchMessage(it, watchSites)
                         )
                     }

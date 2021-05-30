@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.MessageBuilder
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 
-fun createFindMessage(anime: Anime, urlMaker: UrlMaker): Message {
+fun createFindResultMessage(anime: Anime, urlMaker: UrlMaker): Message {
     val title = anime.russian
     val url = urlMaker.makeUrlFrom(anime.url)
     val imageUrl = urlMaker.makeUrlFrom(anime.image?.original)
@@ -44,7 +44,7 @@ fun animeListMessage(animes: List<Anime>, page: Int, size: Int): MessageEmbed {
 }
 
 fun createWatchMessage(anime: Anime, watchSites: Map<String, OnlineWatchWebsite>): Message {
-    val description = watchLinks(watchSites, anime.name)
+    val description = watchLinks(watchSites, anime.russian)
     val embed = EmbedBuilder().setColor(BEST_PINK_COLOR)
         .setDescription(description)
         .setTitle(anime.russian)

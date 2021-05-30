@@ -42,10 +42,11 @@ fun newEpisodeIsOut(
     val embed = EmbedBuilder()
     anime.apply {
         val description = watchLinks(watchSites, name)
+        val animeUrl = urlMaker.makeUrlFrom(anime.url)
         val imageUrl = urlMaker.makeUrlFrom(image?.original)
         embed.setColor(BEST_PINK_COLOR)
             .setDescription(description)
-            .setTitle(anime.russian)
+            .setTitle(anime.russian, animeUrl)
             .addField(RATING, "$score$RATING_EMOJI", true)
             .addField(EPISODES, "$episodesAired/$episodes", true)
             .addField(GENRES, genres?.joinToString { it.russian }, false)
