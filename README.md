@@ -1,4 +1,4 @@
-[![](https://nikosar.beta.teamcity.com/app/rest/builds/buildType:(id:AnimeForever_Build)/statusIcon.svg)](http://nikosar.beta.teamcity.com/viewType.html?buildTypeId=AnimeForever_Build&guest=1)
+[![Build and deploy master](https://github.com/Nikosar/AnimeForever/actions/workflows/gradle.yml/badge.svg)](https://github.com/Nikosar/AnimeForever/actions/workflows/gradle.yml)
 
 # AnimeForever  
 This bot gives you information about anime!
