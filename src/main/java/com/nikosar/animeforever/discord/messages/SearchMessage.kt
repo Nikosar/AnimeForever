@@ -44,7 +44,7 @@ fun animeListMessage(animes: List<Anime>, page: Int, size: Int): MessageEmbed {
 }
 
 fun createWatchMessage(anime: Anime, watchSites: Map<String, OnlineWatchWebsite>): Message {
-    val description = watchLinks(watchSites, anime.russian)
+    val description = watchLinks(watchSites, anime.name)
     val embed = EmbedBuilder().setColor(BEST_PINK_COLOR)
         .setDescription(description)
         .setTitle(anime.russian)
