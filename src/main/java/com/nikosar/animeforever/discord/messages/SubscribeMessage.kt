@@ -54,6 +54,6 @@ fun newEpisodeIsOut(
     }
 
     return MessageBuilder().setEmbed(embed.build())
-        .setContent("$userMentions\nNew episode ${anime.episodesAired}")
+        .setContent("$userMentions\n${anime.russian} / ${anime.episodesAired} серия")
         .build()
 }
