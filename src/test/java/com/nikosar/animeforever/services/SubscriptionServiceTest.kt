@@ -64,7 +64,7 @@ internal open class SubscriptionServiceTest
         subscriptionRepository.save(subscription)
             .and(subscriptionRepository.save(subscription2))
             .block()
-        StepVerifier.create(subscriptionRepository.newReleases(LocalDateTime.now()))
+        StepVerifier.create(subscriptionRepository.newReleasesFrom(LocalDateTime.now()))
             .assertNext { assertEquals(it.userId, subscription.userId) }
             .verifyComplete()
     }

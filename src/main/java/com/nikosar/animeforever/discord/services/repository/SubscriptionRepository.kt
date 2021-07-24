@@ -15,7 +15,7 @@ interface SubscriptionRepository : ReactiveCrudRepository<Subscription, Long> {
         join ANIME A on A.PROVIDER_ID = s.ANIME_ID
         where a.next_episode <= :currentTime"""
     )
-    fun newReleases(currentTime: LocalDateTime): Flux<Subscription>
+    fun newReleasesFrom(currentTime: LocalDateTime): Flux<Subscription>
 
     @Query(
         """

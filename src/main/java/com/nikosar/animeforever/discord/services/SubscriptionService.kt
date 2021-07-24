@@ -55,7 +55,8 @@ open class SubscriptionService(
     @Scheduled(cron = "0 */10 * * * *")
     open fun checkReleases() {
         logger.debug("Checking out releases")
-        subscriptionRepository.newReleases(LocalDateTime.now().plusMinutes(delay))
+        val dateWithDelay = LocalDateTime.now().minusMinutes(delay)
+        subscriptionRepository.newReleasesFrom(dateWithDelay)
             .groupBy { subscription -> subscription.animeId }
             .flatMap { groupedByAnime -> prepareNotices(groupedByAnime) }
             .subscribe()
