@@ -20,7 +20,15 @@ configurations {
 
 repositories {
     mavenCentral()
-    jcenter()
+//    jcenter()
+
+    maven {
+        url "https://jitpack.io"
+    }
+    maven {
+        name 'm2-dv8tion'
+        url 'https://m2.dv8tion.net/releases'
+    }
 }
 
 dependencies {
@@ -30,21 +38,21 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    implementation 'org.apache.httpcomponents:httpclient:4.5.12'
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.11.+"
-    implementation 'net.dv8tion:JDA:4.2.0_168'
-    implementation("club.minnced:jda-reactor:1.2.0")
+    implementation 'org.apache.httpcomponents:httpclient:4.5.13'
+    implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0'
+    implementation 'net.dv8tion:JDA:4.4.0_350'
+    implementation("club.minnced:jda-reactor:1.5.0")
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
 
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
-    testImplementation "io.mockk:mockk:1.10.2"
-    testImplementation "net.bytebuddy:byte-buddy:1.10.2"
+    testImplementation 'io.mockk:mockk:1.13.2'
+    testImplementation 'net.bytebuddy:byte-buddy:1.12.19'
     testImplementation('io.projectreactor:reactor-test')
     testImplementation("org.hamcrest:hamcrest-core")
-    implementation 'org.modelmapper:modelmapper:2.3.8'
+    implementation 'org.modelmapper:modelmapper:3.1.0'
 }
 
 test {

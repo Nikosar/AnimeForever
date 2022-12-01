@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.OnlineStatus
 import net.dv8tion.jda.api.entities.Activity
+import net.dv8tion.jda.api.requests.GatewayIntent
 import org.apache.http.impl.client.HttpClients
 import org.modelmapper.ModelMapper
 import org.springframework.beans.factory.annotation.Value
@@ -32,9 +33,10 @@ open class AnimeForeverApplication {
     @Bean
     open fun jda(@Value("\${discord.bot.token}") token: String): JDA {
         return JDABuilder.createLight(token)
-            .setEventManager(ReactiveEventManager())
-            .setActivity(Activity.listening("-help"))
-            .setStatus(OnlineStatus.ONLINE)
+                .setEventManager(ReactiveEventManager())
+                .setActivity(Activity.listening("-help"))
+                .setStatus(OnlineStatus.ONLINE)
+                .enableIntents(GatewayIntent.GUILD_MESSAGES)
             .build().awaitReady()
     }
 
