@@ -62,5 +62,5 @@ jobs:
         TARGET: ${{ secrets.deploy_target }}
         
     - name: restart service
-      run: ssh ${{ secrets.ssh_user }}@${{ secrets.ssh_host }} -i ~/.ssh/deploy_key sudo systemctl restart anime-forever
+      run: ssh ${{ secrets.ssh_user }}@${{ secrets.ssh_host }} -i ~/.ssh/deploy_key java -jar ~/anime-forever/anime-forever.jar
     
