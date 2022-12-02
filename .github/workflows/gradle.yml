@@ -51,7 +51,7 @@ jobs:
         path: build/libs
         
     - name: ssh deploy
-      uses: easingthemes/ssh-deploy@v2
+      uses: easingthemes/ssh-deploy@main
       with:
         SSH_PRIVATE_KEY: ${{ secrets.ssh_key }}
         ARGS: "-rltgoDzvO --delete"
